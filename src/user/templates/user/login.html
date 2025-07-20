@@ -1,0 +1,27 @@
+{% extends 'task/base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'user_form.css' %}">
+{% endblock %}
+
+{% block content %}
+<main>
+    <div id="errors">
+        {{ form.errors }}
+    </div>
+    <form action="" method="post">
+        {% csrf_token %}
+        <label for="username-id-for-label" >Имя пользователя или адрес электронной почты</label>
+        {{ form.username }}
+
+        <label for="password-id-for-label">Пароль</label>
+        {{ form.password }}
+
+        <a id="password-change-url" href="{% url 'user:password_reset' %}">Забыли пароль?</a>
+
+        <button type="submit">Отправить</button>
+    </form>
+
+</main>
+{% endblock %}

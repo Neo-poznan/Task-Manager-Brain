@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+    <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+    rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    {% block css %}
+    {% endblock %}
+</head>
+<body>
+    <header>
+        <a href="" id="logo-url">
+        <div id="logo-container"><i class="ri-brain-line"></i><h1>Task Manager Brain</h1></div>
+        </a>
+        {% if user.is_authenticated %}
+        <nav>
+            <a href="">История</a>
+            <a href="">Категории Задач</a>
+        </nav>
+        <div id="user-info">
+            <div class="dropdown-container">
+                <button class="drop-button" onclick="dropDown()">{{ user.username }}</button>
+                <div class="dropdown-content" id="user-menu">
+                    <a href="{% url 'user:profile' %}">Профиль</a>
+                    <hr>
+                    <a href="{% url 'user:registration' %}">Страница регистрации</a>
+                    <hr>
+                    <a href="{% url 'user:logout' %}">Выйти</a>
+                </div>                
+            </div>
+            <img id="avatar" src="{{ user.avatar.url }}" alt="Не удалось загрузить аватар" width="75px" height="75px">
+        </div>        
+        {% else %}
+        <nav>
+            <a href="{% url 'user:registration' %}">Регистрация</a>
+            <a href="{% url 'user:login' %}">Аутентификация</a>
+        </nav>       
+        {% endif %}
+
+
+    </header>
+    {% block content %}
+    {% endblock %}
+    <script src="{% static 'js/dropdown_content.js' %}"></script>
+</body>
+</html>

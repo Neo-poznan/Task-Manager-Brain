@@ -1,0 +1,120 @@
+* {
+    margin: 0px;
+    padding: 0px;
+}
+
+* {
+    font-family: "Ubuntu";
+}
+
+body {
+    background-color: rgb(15, 15, 15);
+}
+
+header {
+    border-bottom: 5px solid rgb(53, 53, 53);
+    background-color: rgb(20, 20, 20);
+    height: 120px;
+    display: flex;
+}
+
+header * {
+    align-self: center;
+}
+
+#logo-url {
+    text-decoration: none;
+}
+
+#logo-container {
+    display: flex;
+    margin-left: 4vw;
+    text-wrap: nowrap;
+    color: white;
+}
+
+#logo-container * {
+    display: inline-block;
+}
+
+#logo-container h1:hover {
+    text-decoration: underline;
+}
+
+#logo-container i {
+    font-size: 50pt;
+}
+
+#logo-container i:hover {
+    text-decoration: none;
+}
+
+header nav {
+    display: inline-block;
+    margin-left: 15vw;
+    text-wrap: nowrap;
+}
+
+header nav a {
+    color: gray;
+    font-size: 20pt;
+    margin-left: 100px;
+}
+
+header nav a:hover {
+    color: rgb(52, 51, 51);
+    text-shadow: 2px 2px 1px rgb(82, 82, 82);
+}
+
+#user-info {
+    display: inline-flex;
+    margin-left: 40vw;
+}
+
+#user-info button {
+    background-color: rgb(20, 20, 20);
+    border: none;
+    margin-right: 10px;
+    font-size: 22pt;
+    color: gray;
+    text-decoration: underline;
+}
+
+#user-info button:hover {
+    color: rgb(52, 51, 51);
+    text-shadow: 2px 2px 1px rgb(82, 82, 82);
+}
+
+#avatar {
+    border-radius: 50%;
+    outline: 2px solid gray;
+}
+
+.dropdown-container {
+    position: relative;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: rgb(31, 31, 31);
+    border: 3px solid gray;
+    border-radius: 10px;
+    margin-top: 142px;
+}
+
+.dropdown-content a {
+    display: block;
+    color: gray;
+    font-size: 20pt;
+    text-wrap: nowrap;
+    margin: 12px;
+}
+
+.dropdown-content *:hover {
+    color: rgb(52, 51, 51);
+    text-shadow: 2px 2px 1px rgb(82, 82, 82);
+}
+
+.show {display:block;}
+

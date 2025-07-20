@@ -1,0 +1,35 @@
+{% extends 'task/base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'user_form.css' %}">
+{% endblock %}
+
+{% block content %}
+    <main>
+        <div id="errors">
+            {{ form.errors }}
+        </div>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div id="preview-avatar">
+                    <img src="{% if user.avatar.url != '/media/user_images/default_avatar.png' %}{{ user.avatar.url }} {% endif %}" alt="" id="preview-avatar-image">
+                <i class="ri-file-add-line" id="preview-avatar-alt"></i>
+            </div>
+
+            {{ form.avatar }}
+
+            <label for="username-id-for-label" >Имя пользователя</label>
+            {{ form.username }}
+
+            <label for="email-id-for-label">Адрес электронной почты</label>
+            {{ form.email }}
+
+            <a id="password-change-url" href="{% url 'user:password_change' %}">Поменять пароль</a>
+
+            <button type="submit">Отправить</button>
+        </form>
+
+    </main>
+    <script src="{% static 'js/preview_avatar.js' %}"></script>
+{% endblock %}

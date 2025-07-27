@@ -25,6 +25,8 @@ main div a {
     font-size: 20pt;
     text-wrap: nowrap;
     margin: 12px;
+    transition: all 0.3s ease;
+
 }
 
 main div a:hover {

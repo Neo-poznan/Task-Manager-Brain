@@ -1,0 +1,259 @@
+#container {
+    display: flex;
+    flex-wrap: wrap;
+    width: auto;
+    justify-content: center;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+main {
+    margin-top: 6vh;
+    border: 3px solid gray;
+    border-radius: 20px;
+    width: 900px;
+    padding: 3vh;
+    display: block;
+}
+
+.task-item {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 16px;
+    width: 850px;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+}
+
+.task-link {
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.task-item-name {
+    color: white;
+    font-size: 16pt;
+    width: auto;
+    
+}
+
+.task-link:hover {
+    color: rgb(105, 105, 105);
+    text-shadow: 2px 2px 1px rgb(82, 82, 82);
+}
+
+.task-item-done {
+    display: block;
+    margin-left: auto;
+}
+
+.task-item-done a{
+    text-decoration: none;
+    font-size: 21pt;
+    text-decoration: none;
+    color: green;
+    transition: all 0.3s ease;
+}
+
+.task-item-done a:hover{
+    color: rgb(8, 69, 8);
+}
+
+.task-item-delete {
+    margin-left: 20px;
+    margin-right: 10px;
+}
+
+.task-item-delete a{
+    text-decoration: none;
+    font-size: 18pt;
+    text-decoration: none;
+    color: red;
+    transition: all 0.3s ease;
+}
+
+.task-item-delete a:hover {
+    color: rgb(127, 5, 5);
+}
+
+.task-item-add {
+    border:3px dashed #ccc; 
+    border-radius: 10px;
+    margin: 10px;
+    padding: 16px;
+    width: 845px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.task-item-add:hover {
+    box-shadow: 3px 3px 3px gray;
+    text-shadow: 3px 3px 2px rgb(82, 82, 82);
+
+}
+
+
+.task-item-add i {
+    font-size: 16pt;
+    padding: 4px;
+    border: 3px dashed #ccc;
+    border-radius: 20px;
+}
+
+.task-item-add p {
+    margin-top: 8px;
+}
+
+.task-item-add a {
+    text-decoration: none;
+    color: #ccc;
+
+}
+
+
+
+
+aside {
+    display: block;
+    margin-top: 6vh;
+    width: auto;
+    border: 3px solid gray;
+    border-radius: 20px;
+}
+
+.calendar-wrapper {
+    display: block;
+    width: auto;
+    padding: 2em;
+    border-radius: 5px;
+    text-align: center;
+}
+
+
+.calendar-wrapper h2 {
+    font-family: "Ubuntu";
+    color: white;
+    margin-bottom: 20px;
+}
+
+
+table {
+    clear: both;
+    width: 100%;
+    border-radius: 3px;
+    border-collapse: collapse;
+    color: white;
+    border: 1;
+}
+
+td {
+    height: 48px;
+    text-align: center;
+    vertical-align: middle;
+    width: 48px;
+    border-right: 1px solid gray;
+    border-top: 1px solid gray;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+
+td:last-child {
+    border-right: none;
+}
+
+.days * {
+    border-top: none;
+}
+
+thead td {
+    border: none;
+    color: white;
+    text-transform: uppercase;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+
+td.not-current {
+    color: rgb(75, 74, 74);
+}
+
+td.today {
+    font-weight: 700;
+    color: green;
+    font-size: 1.5em;
+}
+
+#btnPrev {
+    float: left;
+    margin-bottom: 20px;
+}
+
+#btnPrev:before {
+    content: '\f104';
+    font-family: FontAwesome;
+    padding-right: 4px;
+}
+
+#btnNext {
+    float: right;
+    margin-bottom: 20px;
+}
+
+#btnNext:after {
+    content: '\f105';
+    font-family: FontAwesome;
+    padding-left: 4px;
+}
+
+#btnPrev, #btnNext {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 1em;
+    color: gray;
+    cursor: pointer;
+    font-family: sans-serif;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+#btnPrev:hover, #btnNext:hover {
+    color: rgb(52, 51, 51);
+    text-shadow: 2px 2px 1px rgb(82, 82, 82);
+}
+
+.calendar-mark {
+    width: 20px;
+    height: 20px;
+    border: none;
+    margin: 2px;
+    transition: all 0.3s ease;
+}
+
+.calendar-mark:hover {
+    box-shadow: 2px 2px 1px gray;
+}
+
+#chartContainer {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px; 
+    margin-bottom: 30px;    
+    justify-content: center;
+    width: 400px;
+    height: auto;
+
+}
+
+#chartContainer h2 {
+    color: white;
+    font-family: "Ubuntu";
+    margin-bottom: 20px;
+}
+

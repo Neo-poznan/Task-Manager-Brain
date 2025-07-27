@@ -59,6 +59,7 @@ header nav a {
     color: gray;
     font-size: 20pt;
     margin-left: 100px;
+    transition: all 0.3s ease;
 }
 
 header nav a:hover {
@@ -78,6 +79,7 @@ header nav a:hover {
     font-size: 22pt;
     color: gray;
     text-decoration: underline;
+    transition: all 0.3s ease;
 }
 
 #user-info button:hover {
@@ -100,7 +102,7 @@ header nav a:hover {
     background-color: rgb(31, 31, 31);
     border: 3px solid gray;
     border-radius: 10px;
-    margin-top: 142px;
+    margin-top: 135px;
 }
 
 .dropdown-content a {
@@ -109,6 +111,7 @@ header nav a:hover {
     font-size: 20pt;
     text-wrap: nowrap;
     margin: 12px;
+    transition: all 0.3s ease;
 }
 
 .dropdown-content *:hover {

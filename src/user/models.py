@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ObjectDoesNotExist
 
-from .domain import entities
+from .domain.entities import UserEntity
 from .validators import email_validator
 
 
@@ -15,7 +15,7 @@ class User(AbstractUser):
 
 
     @classmethod
-    def from_domain(cls, entity: entities.User):
+    def from_domain(cls, entity: UserEntity):
         return cls(
             id=entity.id,
             username=entity.username,
@@ -27,8 +27,8 @@ class User(AbstractUser):
         )
     
 
-    def to_domain(self):
-        return entities.User(
+    def to_domain(self) -> UserEntity:
+        return UserEntity(
             id=self.id,
             username=self.username,
             email=self.email,

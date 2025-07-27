@@ -1,8 +1,8 @@
 env/
-media/user_images/*
+src/media/user_images/*
 *.sqlite3  
 *.db  
 db.sqlite3
 *.pyc  
-*.pyo  
+*.pyo
 __pycache__

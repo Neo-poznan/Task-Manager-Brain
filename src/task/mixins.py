@@ -4,3 +4,8 @@ class TitleMixin:
         context['title'] = self.title
         return context
 
+
+class UserEntityMixin:
+    def get_user_entity(self):
+        return self.request.user.to_domain()
+

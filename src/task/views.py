@@ -1,3 +1,156 @@
-from django.shortcuts import render
+from django.views.generic import TemplateView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponseBadRequest, HttpResponseForbidden
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-# Create your views here.
+from .mixins import TitleMixin, UserEntityMixin
+from .forms import TaskCreationForm, CategoryCreationForm
+
+from .models import Task, Category
+from .services.use_cases import TaskUseCase
+from .infrastructure.database_repository import TaskDatabaseRepository, CategoryDatabaseRepository
+from .serializers import to_json
+
+
+class MyTasksView(LoginRequiredMixin, UserEntityMixin, TitleMixin, TemplateView):
+    title = 'Мои задачи'
+    template_name = 'task/index.html'
+    use_case = TaskUseCase(task_database_repository=TaskDatabaseRepository(Task))
+
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=object_list, **kwargs)
+        context['chart_data'] = to_json(self.use_case.get_user_task_count_statistics(self.get_user_entity()))
+        context['calendar_data'] = to_json(self.use_case.get_user_task_deadlines_count_statistics(self.get_user_entity()))
+        context['task_list'] = self.use_case.get_ordered_user_tasks(self.get_user_entity())
+        return context
+
+
+class TaskCreationView(LoginRequiredMixin, UserEntityMixin, TitleMixin, CreateView):
+    form_class = TaskCreationForm
+    title = 'Создание задачи'
+    template_name = 'task/task.html'
+    success_url = reverse_lazy('task:my_tasks')
+
+
+    def form_valid(self, form):
+        use_case = TaskUseCase(task_database_repository=TaskDatabaseRepository(Task))        
+        form.instance.order = use_case.get_next_task_order(self.get_user_entity())
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+    
+
+class CategoryCreationView(LoginRequiredMixin, UserEntityMixin, TitleMixin, CreateView):
+    form_class = CategoryCreationForm
+    title = 'Создание категории'
+    template_name = 'task/category.html'
+    success_url = reverse_lazy('task:my_tasks')
+    use_case = TaskUseCase()
+
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=object_list, **kwargs)
+        context['default_color'] = self.use_case.get_random_hex_color()
+        return context
+
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        form.instance.is_custom = True
+        form.instance.color = self.use_case.get_rgba_color_with_default_obscurity(form.cleaned_data.get('color'))
+        return super().form_valid(form)
+    
+
+class TaskUpdateView(LoginRequiredMixin, UserEntityMixin, TitleMixin, UpdateView):
+    form_class = TaskCreationForm
+    title = 'Просмотр и изменение задачи'
+    template_name = 'task/task.html'
+    success_url = reverse_lazy('task:my_tasks')
+    use_case = TaskUseCase(task_database_repository=TaskDatabaseRepository(Task))
+
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except ObjectDoesNotExist:
+            return HttpResponseBadRequest('<h1>400 Bad Request</h1><p>Такой задачи не существует</p>')
+        except PermissionError:
+            return HttpResponseForbidden('<h1>400 Forbidden</h1><p>Вы пытаетесь отредактировать задачу другого пользователя</p>')
+
+
+    def get_object(self):
+        return Task.from_domain(self.use_case.get_user_task_by_id(task_id=self.kwargs.get('task_id'), user=self.get_user_entity()))
+
+
+class CategoryUpdateView(LoginRequiredMixin, UserEntityMixin, TitleMixin, UpdateView):
+    form_class = CategoryCreationForm
+    title = 'Просмотр и изменение категории'
+    template_name = 'task/category.html'
+    success_url = reverse_lazy('task:my_tasks')
+    use_case = TaskUseCase(category_database_repository=CategoryDatabaseRepository(Category))
+
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except ObjectDoesNotExist:
+            return HttpResponseBadRequest('<h1>400 Bad Request</h1><p>Такой категории не существует</p>')
+        except PermissionError:
+            return HttpResponseForbidden('<h1>400 Forbidden</h1><p>Вы пытаетесь отредактировать категорию другого пользователя или системную категорию</p>')
+
+
+    def form_valid(self, form):
+        form.instance.color = self.use_case.get_rgba_color_with_default_obscurity(form.cleaned_data.get('color'))
+        return super().form_valid(form)
+
+
+    def get_object(self):
+        return Category.from_domain(self.use_case.get_user_category_by_id(category_id=self.kwargs.get('category_id'), user=self.get_user_entity()))
+
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=object_list, **kwargs)
+        context['default_color'] = self.use_case.get_hex_color_by_category_id(self.kwargs.get('category_id'))
+        return context
+        
+
+class CategoryDeletionView(LoginRequiredMixin, UserEntityMixin, DeleteView):
+    model = Category
+    success_url = reverse_lazy('task:my_tasks')
+    use_case = TaskUseCase(category_database_repository=CategoryDatabaseRepository(Category))
+
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except ObjectDoesNotExist:
+            return HttpResponseBadRequest('<h1>400 Bad Request</h1><p>Такой категории не существует</p>')
+        except PermissionError:
+            return HttpResponseForbidden('<h1>400 Forbidden</h1><p>Вы пытаетесь удалить категорию другого пользователя или системную категорию</p>')   
+
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponseBadRequest('<h1>Bab Request</h1><p>Неправильный метод запроса</p>')
+    
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.form_valid(form=None)
+
+
+    def get_object(self):
+        return Category.from_domain(self.use_case.get_user_category_by_id(self.kwargs.get('category_id'), self.get_user_entity()))
+    
+
+class CategoriesView(LoginRequiredMixin, UserEntityMixin, TitleMixin, TemplateView):
+    template_name = 'task/categories.html'
+    title = 'Категории'
+    use_case = TaskUseCase(category_database_repository=CategoryDatabaseRepository(Category))
+
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=object_list, **kwargs)
+        context['categories_list'] = self.use_case.get_ordered_user_categories(self.get_user_entity())
+        return context
+

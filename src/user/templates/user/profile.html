@@ -13,8 +13,12 @@
         <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div id="preview-avatar">
-                    <img src="{% if user.avatar.url != '/media/user_images/default_avatar.png' %}{{ user.avatar.url }} {% endif %}" alt="" id="preview-avatar-image">
-                <i class="ri-file-add-line" id="preview-avatar-alt"></i>
+                {% if user.avatar.url != '/media/user_images/default_avatar.png' %}
+                    <img src="{{ user.avatar.url }}" alt="" id="preview-avatar-image">            
+                {% else %}
+                    <img src="" alt="" id="preview-avatar-image">
+                    <i class="ri-file-add-line" id="preview-avatar-alt"></i>
+                {% endif %}
             </div>
 
             {{ form.avatar }}

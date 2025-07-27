@@ -24,7 +24,7 @@
         {% if user.is_authenticated %}
         <nav>
             <a href="">История</a>
-            <a href="">Категории Задач</a>
+            <a href="{% url 'task:categories' %}">Категории Задач</a>
         </nav>
         <div id="user-info">
             <div class="dropdown-container">

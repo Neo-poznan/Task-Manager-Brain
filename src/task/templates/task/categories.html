@@ -1,0 +1,28 @@
+{% extends 'task/base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'categories.css' %}">
+{% endblock %}
+
+{% block content %}
+<main>
+    <div id="categories-list">
+        {% for category in categories_list %}
+        <div class="category-item">
+            <div class="category-name">
+                {% if category.is_custom %}
+                    <a class="category-link" href="{% url 'task:category' category.id %}"><p>{{ category.name }}</p></a>
+                {% else %}
+                    <p class="not-custom-category-name">{{ category.name }}</p>
+                {% endif %}
+            </div>
+                {% if category.is_custom %}
+                    <div class="delete-category"><a href="{% url 'task:category_deletion' category.id %}"><i class="ri-delete-bin-6-line"></i></a></div>
+                {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+</main>
+{% endblock %}

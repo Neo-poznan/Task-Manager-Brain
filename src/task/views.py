@@ -1,22 +1,25 @@
-from django.views.generic import TemplateView, CreateView, UpdateView, DeleteView
+from django.views.generic import TemplateView, CreateView, UpdateView, DeleteView, View
 from django.urls import reverse_lazy
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpResponse, HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render
+from django.db import connection
 
 from .mixins import TitleMixin, UserEntityMixin
-from .forms import TaskCreationForm, CategoryCreationForm
-
+from .forms import TaskCreationForm, CategoryCreationForm, TaskHistoryForm
 from .models import Task, Category
 from .services.use_cases import TaskUseCase
 from .infrastructure.database_repository import TaskDatabaseRepository, CategoryDatabaseRepository
-from .serializers import to_json
+from .serializers import to_json, from_json
+from history.infrastructure.database_repository import HistoryDatabaseRepository
+from history.models import History
 
 
 class MyTasksView(LoginRequiredMixin, UserEntityMixin, TitleMixin, TemplateView):
     title = 'Мои задачи'
     template_name = 'task/index.html'
-    use_case = TaskUseCase(task_database_repository=TaskDatabaseRepository(Task))
+    use_case = TaskUseCase(task_database_repository=TaskDatabaseRepository(Task, connection))
 
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -35,7 +38,7 @@ class TaskCreationView(LoginRequiredMixin, UserEntityMixin, TitleMixin, CreateVi
 
 
     def form_valid(self, form):
-        use_case = TaskUseCase(task_database_repository=TaskDatabaseRepository(Task))        
+        use_case = TaskUseCase(task_database_repository=TaskDatabaseRepository(Task, connection))        
         form.instance.order = use_case.get_next_task_order(self.get_user_entity())
         form.instance.user = self.request.user
         return super().form_valid(form)
@@ -67,7 +70,7 @@ class TaskUpdateView(LoginRequiredMixin, UserEntityMixin, TitleMixin, UpdateView
     title = 'Просмотр и изменение задачи'
     template_name = 'task/task.html'
     success_url = reverse_lazy('task:my_tasks')
-    use_case = TaskUseCase(task_database_repository=TaskDatabaseRepository(Task))
+    use_case = TaskUseCase(task_database_repository=TaskDatabaseRepository(Task, connection))
 
 
     def dispatch(self, request, *args, **kwargs):
@@ -77,6 +80,12 @@ class TaskUpdateView(LoginRequiredMixin, UserEntityMixin, TitleMixin, UpdateView
             return HttpResponseBadRequest('<h1>400 Bad Request</h1><p>Такой задачи не существует</p>')
         except PermissionError:
             return HttpResponseForbidden('<h1>400 Forbidden</h1><p>Вы пытаетесь отредактировать задачу другого пользователя</p>')
+
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['deadline'] = str(self.get_object().deadline)
+        return initial
 
 
     def get_object(self):
@@ -153,4 +162,77 @@ class CategoriesView(LoginRequiredMixin, UserEntityMixin, TitleMixin, TemplateVi
         context = super().get_context_data(object_list=object_list, **kwargs)
         context['categories_list'] = self.use_case.get_ordered_user_categories(self.get_user_entity())
         return context
+    
 
+class OrderUpdateView(LoginRequiredMixin, UserEntityMixin, View):
+    def get(self, request):
+        return HttpResponseBadRequest('<h1>Bab Request</h1><p>Неправильный метод запроса</p>')
+    
+
+    def put(self, request):
+        post_data = self.request.body.decode('utf-8')
+        post_data_json = from_json(post_data)
+        use_case = TaskUseCase(task_database_repository=TaskDatabaseRepository(Task, connection))
+        use_case.update_user_task_order(self.get_user_entity(), post_data_json['order'])
+        return HttpResponse('OK')
+
+
+class TaskCompletionView(LoginRequiredMixin, UserEntityMixin, TitleMixin, View):
+    title = 'Подтверждение выполнения задачи'
+
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except PermissionError:
+            return HttpResponseForbidden('<h1>400 Forbidden</h1><p>Вы пытаетесь удалить задачу другого пользователя</p>')
+
+
+    def get(self, request, task_id: int):
+        return render(
+            request, 
+            'task/save_task_to_history.html',
+            context={'form': TaskHistoryForm(), 'label': 'Сколько времени вам понадобилось на процесс выполнения непосредственно этой задачи'}
+        )
+    
+
+    def post(self, request, task_id: int):
+        use_case = TaskUseCase(
+            task_database_repository=TaskDatabaseRepository(Task, connection),
+            history_database_repository=HistoryDatabaseRepository(Task, History, connection)
+        )
+        use_case.save_completed_task_to_history(self.get_user_entity(), task_id, self.request.POST['execution_time'])
+
+        return HttpResponseRedirect(reverse_lazy('task:my_tasks'))
+    
+
+class TaskFailView(LoginRequiredMixin, UserEntityMixin, TitleMixin, View): 
+    title = 'Подтверждение провала задачи'
+
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except PermissionError:
+            return HttpResponseForbidden('<h1>400 Forbidden</h1><p>Вы пытаетесь удалить задачу другого пользователя</p>')
+
+
+    def get(self, request, task_id: int):
+        return render(
+            request,
+            'task/save_task_to_history.html', 
+            context={'form': TaskHistoryForm(), 'label': 'Сколько времени вам понадобилось на то, чтобы понять, что вы не сможете выполнить задачу'}
+        )
+    
+
+    def post(self, request, task_id: int):
+        use_case = TaskUseCase(
+            task_database_repository=TaskDatabaseRepository(Task, connection),
+            history_database_repository=HistoryDatabaseRepository(Task, History)
+        )
+        use_case.save_failed_task_to_history(self.get_user_entity(), task_id, self.request.POST['execution_time'])
+
+        return HttpResponseRedirect(reverse_lazy('task:my_tasks'))
+    
+    
+    

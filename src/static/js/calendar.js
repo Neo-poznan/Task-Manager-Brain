@@ -100,7 +100,16 @@ var Cal = function(divId) {
             var chkY = chk.getFullYear();
             var chkM = chk.getMonth();
             if (chkY == this.currYear && chkM == this.currMonth && i == this.currDay) {
-                html += '<td class="today">' + i + '</td>';
+                
+                let deadlinesOnCurrentDate = this.getDeadlinesByDate(this.currYear, this.currMonth+1, i)
+                let deadlinesHtml = ''
+                if (deadlinesOnCurrentDate) {
+                    for(let deadlinesCount=0; deadlinesCount < deadlinesOnCurrentDate.length; deadlinesCount++) {
+                        deadlinesHtml += `<button title="У вас запланировано следующее количество задач по категории ${deadlinesOnCurrentDate[deadlinesCount]['category']}: ${deadlinesOnCurrentDate[deadlinesCount]['count']}" class="calendar-mark" style="background-color: ${deadlinesOnCurrentDate[deadlinesCount]['color']};"></button>`
+                    }                    
+                }
+                html += '<td class="today">' + i + deadlinesHtml+ '</td>';
+
             }
             else {
                 let deadlinesOnCurrentDate = this.getDeadlinesByDate(this.currYear, this.currMonth+1, i)

@@ -4,7 +4,7 @@
     filter: invert(100%);
 }
 
-#planed-time-id-for-label::-webkit-calendar-picker-indicator {
+#planned-time-id-for-label::-webkit-calendar-picker-indicator {
     filter: invert(100%);
 }
 
@@ -48,7 +48,22 @@ textarea {
     margin-bottom: 40px; 
     padding: 35px;
     font-size: 16pt;
-    overflow: scroll;
+    overflow-y: scroll;
+}
+
+#rendering-content::-webkit-scrollbar {
+  width: 15px; /* Ширина всего элемента навигации */
+}
+
+#rendering-content::-webkit-scrollbar-track {
+  background: #959595; /* Цвет дорожки */
+  border-radius: 20px;
+}
+
+#rendering-content::-webkit-scrollbar-thumb {
+  background-color: rgb(49, 49, 49); /* Цвет бегунка */
+  border-radius: 20px; /* Округление бегунка */
+  border: none;
 }
 
 #placeholder {

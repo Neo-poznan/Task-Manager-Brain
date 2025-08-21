@@ -257,3 +257,8 @@ td.today {
     margin-bottom: 20px;
 }
 
+.fire-icon-container i {
+    font-size: 24pt;
+    color: orange;
+}
+

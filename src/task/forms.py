@@ -1,3 +1,4 @@
+from datetime import timedelta
 from django import forms
 
 from .models import Task as Task
@@ -31,10 +32,10 @@ class TaskCreationForm(forms.ModelForm):
         label='Крайняя дата выполнения задачи (необязательно)'
     )
 
-    planed_time = forms.DurationField(
+    planned_time = forms.DurationField(
         widget=forms.TimeInput(attrs={
             'type': 'time',
-            'id': 'planed-time-id-for-label',
+            'id': 'planned-time-id-for-label',
             'step': '1',
 
         }),
@@ -42,9 +43,21 @@ class TaskCreationForm(forms.ModelForm):
     )
 
 
+    def clean_planned_time(self):
+        '''
+        Округляет планируемое время выполнения до десятков минут.
+        Называется так, потому что форма вызывает только такие названия
+        '''
+        planned_time_str = str(self.cleaned_data.get('planned_time'))
+        planned_time_hours = planned_time_str.split(':')[0]
+        planned_time_minutes = planned_time_str.split(':')[1]
+        rounded_planned_time_ten_minutes = planned_time_minutes[0] if int(planned_time_minutes[1]) < 5 else str(int(planned_time_minutes[0]) + 1)
+        return timedelta(hours=int(planned_time_hours), minutes=int(rounded_planned_time_ten_minutes + '0'))
+
+
     class Meta:
         model = Task
-        fields = ['name', 'description', 'category', 'deadline', 'planed_time']
+        fields = ['name', 'description', 'category', 'deadline', 'planned_time']
 
 
 class CategoryCreationForm(forms.ModelForm):
@@ -78,4 +91,17 @@ class CategoryCreationForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ['name', 'description', 'color']
+
+
+
+class TaskHistoryForm(forms.Form):
+    execution_time = forms.DurationField(
+        widget=forms.TimeInput(attrs={
+            'type': 'time',
+            'id': 'execution-time-id-for-label',
+            'step': '1',
+
+        })
+    )
+
 

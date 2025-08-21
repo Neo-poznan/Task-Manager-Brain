@@ -24,5 +24,5 @@ class TaskEntity:
     category: CategoryEntity
     user: UserEntity
     deadline: Optional[datetime]
-    planed_time: str
+    planned_time: str
 

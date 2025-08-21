@@ -1,0 +1,194 @@
+#container {
+    display: flex;
+    flex-wrap: wrap;
+    width: auto;
+    justify-content: center;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+main {
+    margin-top: 6vh;
+    border: 3px solid gray;
+    border-radius: 20px;
+    width: 900px;
+    padding: 3vh;
+    display: block;
+}
+
+.task-item {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 16px;
+    width: 850px;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+}
+
+.task-item-name{
+    color: white;
+    font-size: 16pt;
+    width: auto;
+}
+
+.task-item-done {
+    display: block;
+    margin-left: auto;
+}
+
+.task-item-done a{
+    text-decoration: none;
+    font-size: 21pt;
+    text-decoration: none;
+    color: green;
+    transition: all 0.3s ease;
+}
+
+.task-item-done a:hover{
+    color: rgb(8, 69, 8);
+}
+
+.task-item-delete {
+    margin-left: 20px;
+    margin-right: 10px;
+}
+
+.task-item-delete a{
+    text-decoration: none;
+    font-size: 18pt;
+    text-decoration: none;
+    color: red;
+    transition: all 0.3s ease;
+}
+
+.task-item-delete a:hover {
+    color: rgb(127, 5, 5);
+}
+
+.task-item-add {
+    border:3px dashed #ccc; 
+    border-radius: 10px;
+    margin: 10px;
+    padding: 16px;
+    width: 845px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.task-item-add:hover {
+    box-shadow: 3px 3px 3px gray;
+    text-shadow: 3px 3px 2px rgb(82, 82, 82);
+
+}
+
+
+.task-item-add i {
+    font-size: 16pt;
+    padding: 4px;
+    border: 3px dashed #ccc;
+    border-radius: 20px;
+}
+
+.task-item-add p {
+    margin-top: 8px;
+}
+
+.task-item-add a {
+    text-decoration: none;
+    color: #ccc;
+
+}
+
+
+
+
+aside {
+    display: block;
+    margin-top: 6vh;
+    border: 3px solid gray;
+    border-radius: 20px;
+    padding: 20px;
+    width: 500px;
+}
+
+
+.statistics-container {
+    width: 500px;
+    height: auto;
+    overflow: hidden; /* Скрываем выходящий за пределы контент */
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.statistics-wrapper {
+    display: flex;
+    transition: transform 0.5s ease-in-out; /* Анимация плавного смещения */
+}
+
+.content {
+    min-width: 500px; /* Ширина каждого контента равна ширине контейнера */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    background-color: rgb(15, 15, 15);
+    font-size: 1.5rem;
+}
+
+.content h1 {
+    color: white;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.button-container {
+    display: flex;
+    gap: 100px;
+    justify-content: center;
+    padding-bottom: 20px;
+
+}
+
+
+#btnPrev, #btnNext {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 18pt;
+    color: gray;
+    cursor: pointer;
+    font-family: sans-serif;
+    transition: all 0.3s ease;
+    text-decoration: underline;
+}
+
+#btnPrev:hover, #btnNext:hover {
+    color: rgb(52, 51, 51);
+    text-shadow: 2px 2px 1px rgb(82, 82, 82);
+}
+
+.common-statistics-container {
+    display: flex;
+    width: auto;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
+}
+
+.common-statistics-container h1 {
+    height: 50px;
+    width: 100px;
+    font-size: 10pt;
+    color: white;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.common-chart-container {
+    width: 150px;
+}

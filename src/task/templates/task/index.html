@@ -12,10 +12,10 @@
         
         <div id="task-list">
             {% for task in task_list %}    
-                <div class="task-item" draggable="true" id="task{{ task.order }}">
+                <div class="task-item" draggable="true" id="task{{ task.id }}" deadline="{{ task.deadline.year }}:{{ task.deadline.month }}:{{ task.deadline.day }}">
                     <div class="task-item-name"><a class="task-link" href="{% url 'task:task' task.id %}"><p>{{ task.name }}</p></div></a>
-                    <div class="task-item-done"><a href=""><i class="ri-check-line"></i></a></div>
-                    <div class="task-item-delete"><a href=""><i class="ri-delete-bin-6-line"></i></a></div>
+                    <div class="task-item-done"><a href="{% url 'task:task_completion' task.id %}"><i class="ri-check-line"></i></a></div>
+                    <div class="task-item-delete"><a href="{% url 'task:task_fail' task.id %}"><i class="ri-delete-bin-6-line"></i></a></div>
                 </div>
             {% endfor %}
 
@@ -45,10 +45,14 @@
 </div>
 
 <script>
-    chart_data = JSON.parse('{{ chart_data|escapejs }}');
-    calendar_data = JSON.parse('{{ calendar_data|escapejs }}')
+    let chart_data = JSON.parse('{{ chart_data|escapejs }}');
+    let calendar_data = JSON.parse('{{ calendar_data|escapejs }}')
+    let csrftoken = '{{ csrf_token }}'
+    let ordersUpdateUrl = "{% url 'task:order_update' %}"
 </script>
 <script src="{% static 'js/calendar.js' %}"></script>
-<script src="{% static 'js/doughnut_chart.js' %}"></script>
+<script src="{% static 'js/current_tasks_chart.js' %}"></script>
+<script src="{% static 'js/drag.js' %}"></script>
+<script src="{% static 'js/burning_deadlines.js' %}"></script>
 
 {% endblock %}

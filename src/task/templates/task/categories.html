@@ -9,7 +9,7 @@
 <main>
     <div id="categories-list">
         {% for category in categories_list %}
-        <div class="category-item">
+        <div class="category-item" style="background-color: {{ category.color }};">
             <div class="category-name">
                 {% if category.is_custom %}
                     <a class="category-link" href="{% url 'task:category' category.id %}"><p>{{ category.name }}</p></a>

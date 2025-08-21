@@ -45,6 +45,10 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+    class Meta:
+        verbose_name = 'Категории задач'
 
 
 class Task(models.Model):
@@ -54,7 +58,7 @@ class Task(models.Model):
     category = models.ForeignKey(to=Category, on_delete=models.CASCADE, null=False, blank=False, verbose_name='Категория, к которой относится задача')
     user = models.ForeignKey(to=get_user_model(), on_delete=models.CASCADE, null=False, blank=False, verbose_name='Пользователь, создавший задачу')
     deadline = models.DateField(null=True, blank=True, verbose_name='Крайний срок выполнения задачи')
-    planed_time = models.DurationField(null=False, blank=False, verbose_name='Время, запланированное на процесс выполнения задачи')
+    planned_time = models.DurationField(null=False, blank=False, verbose_name='Время, запланированное на процесс выполнения задачи')
 
     objects = DomainQuerySet.as_manager()
 
@@ -69,7 +73,7 @@ class Task(models.Model):
             category=Category.from_domain(entity.category),
             user=User.from_domain(entity.user),
             deadline=entity.deadline,
-            planed_time=entity.planed_time
+            planned_time=entity.planned_time
         )
 
 
@@ -82,6 +86,10 @@ class Task(models.Model):
             category=self.category.to_domain(),
             user=self.user.to_domain(),
             deadline=self.deadline,
-            planed_time=self.planed_time,
+            planned_time=self.planned_time,
         )
+
+
+    class Meta:
+        verbose_name = 'Задачи, которые пользователи ставят себе'
 

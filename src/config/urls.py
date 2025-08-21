@@ -19,8 +19,9 @@ from django.urls import path, include
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('user/', include('user.urls', namespace='user')),
 	path('', include('task.urls', namespace='task')),
+    path('user/', include('user.urls', namespace='user')),	
+	path('history/', include('history.urls', namespace='history'))	
 ]
 
 if settings.DEBUG:

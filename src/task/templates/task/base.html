@@ -18,12 +18,12 @@
 </head>
 <body>
     <header>
-        <a href="" id="logo-url">
+        <a href="{% url 'task:my_tasks' %}" id="logo-url">
         <div id="logo-container"><i class="ri-brain-line"></i><h1>Task Manager Brain</h1></div>
         </a>
         {% if user.is_authenticated %}
         <nav>
-            <a href="">История</a>
+            <a href="{% url 'history:history' %}">История</a>
             <a href="{% url 'task:categories' %}">Категории Задач</a>
         </nav>
         <div id="user-info">

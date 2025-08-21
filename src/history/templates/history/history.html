@@ -1,0 +1,88 @@
+{% extends 'task/base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'history.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div id="container">
+        <main>
+                        <div id="task-list">
+                    <div class="task-item" draggable="true" id="task1">
+                        <div class="task-item-name"><p>Задача 1</p></div>
+                        <div class="task-item-done"><a href=""><i class="ri-check-line"></i></a></div>
+                        <div class="task-item-delete"><a href=""><i class="ri-delete-bin-6-line"></i></a></div>
+                    </div>
+                    <div class="task-item" draggable="true" id="task2">
+                        <div class="task-item-name"><p>Задача 2</p></div>
+                        <div class="task-item-done"><a href=""><i class="ri-check-line"></i></a></div>
+                        <div class="task-item-delete"><a href=""><i class="ri-delete-bin-6-line"></i></a></div>
+
+                    </div>
+                    <div class="task-item" draggable="true" id="task3">
+                        <div class="task-item-name"><p>Задача 3</p></div>
+                        <div class="task-item-done"><a href=""><i class="ri-check-line"></i></a></div>
+                        <div class="task-item-delete"><a href=""><i class="ri-delete-bin-6-line"></i></a></div>
+
+                    </div>
+                    <div class="task-item" draggable="true" id="task4">
+                        <div class="task-item-name"><p>Задача 4</p></div>
+                        <div class="task-item-done"><a href=""><i class="ri-check-line"></i></a></div>
+                        <div class="task-item-delete"><a href=""><i class="ri-delete-bin-6-line"></i></a></div>
+
+                    </div>
+                    <div class="task-item" draggable="true" id="task5">
+                        <div class="task-item-name"><p>Задача 5</p></div>
+                        <div class="task-item-done"><a href=""><i class="ri-check-line"></i></a></div>
+                        <div class="task-item-delete"><a href=""><i class="ri-delete-bin-6-line"></i></a></div>
+
+                    </div>
+                    <div class="task-item-add">
+                        <a href="#">
+                            <i class="ri-add-large-line"></i>
+                            <p>Добавить задачу</p>
+                        </a> 
+                    </div>
+                </div> 
+
+        </main>
+        <aside>
+         
+            <div class="statistics-container">
+                <div class="button-container">
+                    <button id="btnPrev">Предыдущая</button>
+                    <button id="btnNext">Дальше</button>
+                </div>                   
+                <div class="statistics-wrapper">
+                    <div class="content"><h1>Количество задач в категориях</h1><canvas id="countUserTasksInCategoriesChart"></canvas></div>
+                    <div class="content"><h1>Точность вашего планирования в каждой категории</h1><canvas id="userAccuracyByCategoriesChart"></canvas></div>
+                    <div class="content"><h1>Количество успешно выполненных задач в каждой категории</h1><canvas id="userSuccessRateByCategoriesChart"></canvas></div>
+                    <div class="content"><h1>Количество выполненных задач по каждому дню недели</h1><canvas id="countUserTasksByWeekdaysChart"></canvas></div>
+                    <div class="content"><h1>Количество успешно спланированных задач в каждой категории</h1><canvas id="countUserSuccessfulPlannedTasksByCategoriesChart"></canvas></div>
+                </div>
+
+            </div>
+            <div class="common-statistics-container">
+                <div class="common-chart-container"><h1>Точность планирования</h1><canvas id="commonUserAccuracyChart"></canvas></div>
+                <div class="common-chart-container"><h1>Успешно выполненные задачи</h1><canvas id="commonUserSuccessRateChart"></canvas></div>                    
+                <div class="common-chart-container"><h1>Правильно запланированные задачи</h1><canvas id="commonCountUserSuccessfulPlannedTasksChart"></canvas></div>
+
+            </div>            
+
+        </aside>
+
+    <script>
+        const countUserTasksInCategories = JSON.parse('{{ count_user_tasks_in_categories|escapejs }}');
+        const commonUserAccuracy = JSON.parse('{{ common_user_accuracy|escapejs }}');
+        const userAccuracyByCategories = JSON.parse('{{ user_accuracy_by_categories|escapejs }}');
+        const commonUserSuccessRate = JSON.parse('{{ common_user_success_rate|escapejs }}');
+        const userSuccessRateByCategories = JSON.parse('{{ user_success_rate_by_categories|escapejs }}');
+        const countUserTasksByWeekdays = JSON.parse('{{ count_user_tasks_by_weekdays|escapejs }}');
+        const commonCountUserSuccessfulPlannedTasks = JSON.parse('{{ common_count_user_successful_planned_tasks|escapejs }}');
+        const countUserSuccessfulPlannedTasksByCategories = JSON.parse('{{ count_user_successful_planned_tasks_by_categories|escapejs }}');
+    </script>
+    <script src="{% static 'js/history.js' %}"></script>
+{% endblock %}
+

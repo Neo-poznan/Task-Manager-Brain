@@ -2,7 +2,7 @@ from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView,
 from django.views.generic import CreateView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 
 from .forms import UserRegistrationForm, UserLoginForm, UserProfileForm, UserPasswordChangeForm, UserPasswordResetForm, UserPasswordResetConfirmForm
 from task.mixins import TitleMixin
@@ -39,7 +39,7 @@ class UserProfileView(TitleMixin, LoginRequiredMixin, UpdateView):
     
 
     def get_success_url(self):
-        return self.request.headers['Referer']
+        return reverse_lazy('user:profile')
 
 
 class UserPasswordChangeView(TitleMixin, LoginRequiredMixin, PasswordChangeView):
@@ -103,4 +103,8 @@ class UserPasswordResetConfirmView(TitleMixin, PasswordResetConfirmView):
 class UserPasswordResetCompleteView(TitleMixin, PasswordResetCompleteView):
     template_name = 'user/password_reset_complete.html'
     title = 'Успешно'
+
+
+def check_user_status(request):
+    return JsonResponse({'status': request.user.is_authenticated})
    

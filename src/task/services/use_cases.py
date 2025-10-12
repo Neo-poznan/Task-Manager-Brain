@@ -146,6 +146,7 @@ class TaskUseCase(TaskUseCaseInterface):
         deadlines_count_statistics = {}
         for row in raw_task_deadlines_count_statistics:
             deadlines_count_statistics[row[0].strftime('%Y.%m.%d')] = row[1]
+        print(deadlines_count_statistics)
         return deadlines_count_statistics
     
 

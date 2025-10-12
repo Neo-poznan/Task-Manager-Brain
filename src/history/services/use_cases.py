@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from decimal import Decimal
+from dataclasses import dataclass
 
 from user.domain.entities import UserEntity
 from ..infrastructure.database_repository import HistoryDatabaseRepositoryInterface
@@ -17,15 +18,22 @@ class HistoryUseCase(HistoryUseCaseInterface):
         self._history_database_repository = history_database_repository
     
 
-    def get_user_history_statistics(self, user: UserEntity):
-        raw_count_user_tasks_in_categories = self._history_database_repository.get_count_user_tasks_in_categories(user)
-        raw_common_user_accuracy = self._history_database_repository.get_common_user_accuracy(user)
-        raw_user_accuracy_by_categories = self._history_database_repository.get_user_accuracy_by_categories(user)
-        raw_common_user_success_rate = self._history_database_repository.get_user_common_success_rate(user)
-        raw_user_success_rate_by_categories = self._history_database_repository.get_user_success_rate_by_categories(user)
-        raw_count_user_tasks_by_weekdays = self._history_database_repository.get_count_user_tasks_by_weekdays(user)   
-        raw_common_count_successful_planned_tasks = self._history_database_repository.get_common_count_user_successful_planned_tasks(user)
-        raw_count_successful_planned_tasks_by_categories = self._history_database_repository.get_count_user_successful_planned_tasks_by_categories(user)
+    def get_user_history_statistics(self, user: UserEntity, from_date: str, to_date: str):
+        raw_count_user_tasks_in_categories = self._history_database_repository.get_count_user_tasks_in_categories(user, from_date, to_date)
+        raw_common_user_accuracy = self._history_database_repository.get_common_user_accuracy(user, from_date, to_date)
+        raw_user_accuracy_by_categories = self._history_database_repository.get_user_accuracy_by_categories(user, from_date, to_date)
+        raw_common_user_success_rate = self._history_database_repository.get_user_common_success_rate(user, from_date, to_date)
+        raw_user_success_rate_by_categories = self._history_database_repository.get_user_success_rate_by_categories(user, from_date, to_date)
+        raw_count_user_tasks_by_weekdays = self._history_database_repository.get_count_user_tasks_by_weekdays(user, from_date, to_date)   
+        raw_common_count_successful_planned_tasks = self._history_database_repository.get_common_count_user_successful_planned_tasks(user, from_date, to_date)
+        raw_count_successful_planned_tasks_by_categories = self._history_database_repository.get_count_user_successful_planned_tasks_by_categories(user, from_date, to_date)
+
+        history = self._history_database_repository.get_user_history(user, from_date, to_date)
+
+        @dataclass
+        class FakeHistoryTask:
+            name: str
+            id: None
 
         return {
             'count_user_tasks_in_categories': to_json(self._format_count_user_tasks_in_categories(raw_count_user_tasks_in_categories)),
@@ -35,7 +43,8 @@ class HistoryUseCase(HistoryUseCaseInterface):
             'user_success_rate_by_categories': to_json(self._format_user_success_rate_by_categories(raw_user_success_rate_by_categories)),
             'count_user_tasks_by_weekdays': to_json(self._format_count_user_tasks_by_weekdays(raw_count_user_tasks_by_weekdays)),
             'common_count_user_successful_planned_tasks': to_json(self._format_common_count_user_successful_planned_tasks(raw_common_count_successful_planned_tasks)),
-            'count_user_successful_planned_tasks_by_categories': to_json(self._format_count_user_successful_planned_tasks_by_categories(raw_count_successful_planned_tasks_by_categories))
+            'count_user_successful_planned_tasks_by_categories': to_json(self._format_count_user_successful_planned_tasks_by_categories(raw_count_successful_planned_tasks_by_categories)),
+            'history': history if len(history) > 1 else [FakeHistoryTask(name='В этот период времени у вас не было ни одной задачи', id=None)]
         }
 
  
@@ -48,11 +57,14 @@ class HistoryUseCase(HistoryUseCaseInterface):
         return count_user_tasks_in_categories
     
     def _format_common_user_accuracy(self, raw_common_user_accuracy: list[tuple[Decimal]]) -> dict[str, list]:
-        return {
-                'labels': ['Точность', 'Точность'],
-                'colors': ['rgba(0, 255, 0, 0.4)', 'rgba(255, 0, 0, 0.4)'],
-                'data': [float(raw_common_user_accuracy[0][0]), 100.0 - float(raw_common_user_accuracy[0][0])]
-            }
+        try:
+            return {
+                    'labels': ['Точность', 'Точность'],
+                    'colors': ['rgba(0, 255, 0, 0.4)', 'rgba(255, 0, 0, 0.4)'],
+                    'data': [float(raw_common_user_accuracy[0][0]), 100.0 - float(raw_common_user_accuracy[0][0])]
+                }
+        except TypeError:
+            return {}
     
     def _format_user_accuracy_by_categories(self, raw_user_accuracy_by_categories: list[tuple[str, Decimal]]) -> dict[str, list]:
         user_accuracy_by_categories = {'labels': [], 'colors': [], 'data': []}

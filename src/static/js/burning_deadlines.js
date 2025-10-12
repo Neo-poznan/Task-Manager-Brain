@@ -16,12 +16,16 @@ for (let i=0; i < tasks.length; i++) {
     let deadlineDate = new Date(year=deadlineYear, month=deadlineMonth-1, day=deadlineDay);
     console.log(nowWithoutTime);
     console.log(deadlineDate);
-    if (deadlineDate.getDate() === nowWithoutTime.getDate()) {
+    if (deadlineDate === nowWithoutTime) {
         tasks[i].style.backgroundColor = 'rgba(255, 0, 0, 0.4)';
         tasks[i].innerHTML = tasks[i].innerHTML + '<div class="fire-icon-container"><i class="ri-fire-line"></i></div>'
     }
-    else if (deadlineDate.getDate() === nowWithoutTimePlus1Day.getDate()) {
+    else if (deadlineDate === nowWithoutTimePlus1Day) {
         tasks[i].style.backgroundColor = 'rgba(255, 0, 0, 0.4)';
         tasks[i].innerHTML = tasks[i].innerHTML + '<div class="fire-icon-container"><i class="ri-fire-line"></i></div>'     
+    }
+    else if (deadlineDate < nowWithoutTime) {
+        tasks[i].style.backgroundColor = 'rgba(255, 0, 0, 0.4)';
+        tasks[i].innerHTML = tasks[i].innerHTML + '<div class="fire-icon-container"><i class="ri-fire-line"></i></div>'        
     }
 }

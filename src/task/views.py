@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.db import connection
 
-from .mixins import TitleMixin, UserEntityMixin
+from .mixins import TitleMixin, UserEntityMixin, LoginRequiredMixinWithRedirectMessage
 from .forms import TaskCreationForm, CategoryCreationForm, TaskHistoryForm
 from .models import Task, Category
 from .services.use_cases import TaskUseCase
@@ -16,7 +16,7 @@ from history.infrastructure.database_repository import HistoryDatabaseRepository
 from history.models import History
 
 
-class MyTasksView(LoginRequiredMixin, UserEntityMixin, TitleMixin, TemplateView):
+class MyTasksView(LoginRequiredMixinWithRedirectMessage, UserEntityMixin, TitleMixin, TemplateView):
     title = 'Мои задачи'
     template_name = 'task/index.html'
     use_case = TaskUseCase(task_database_repository=TaskDatabaseRepository(Task, connection))
@@ -30,7 +30,7 @@ class MyTasksView(LoginRequiredMixin, UserEntityMixin, TitleMixin, TemplateView)
         return context
 
 
-class TaskCreationView(LoginRequiredMixin, UserEntityMixin, TitleMixin, CreateView):
+class TaskCreationView(LoginRequiredMixinWithRedirectMessage, UserEntityMixin, TitleMixin, CreateView):
     form_class = TaskCreationForm
     title = 'Создание задачи'
     template_name = 'task/task.html'
@@ -44,7 +44,7 @@ class TaskCreationView(LoginRequiredMixin, UserEntityMixin, TitleMixin, CreateVi
         return super().form_valid(form)
     
 
-class CategoryCreationView(LoginRequiredMixin, UserEntityMixin, TitleMixin, CreateView):
+class CategoryCreationView(LoginRequiredMixinWithRedirectMessage, UserEntityMixin, TitleMixin, CreateView):
     form_class = CategoryCreationForm
     title = 'Создание категории'
     template_name = 'task/category.html'
@@ -65,7 +65,7 @@ class CategoryCreationView(LoginRequiredMixin, UserEntityMixin, TitleMixin, Crea
         return super().form_valid(form)
     
 
-class TaskUpdateView(LoginRequiredMixin, UserEntityMixin, TitleMixin, UpdateView):
+class TaskUpdateView(LoginRequiredMixinWithRedirectMessage, UserEntityMixin, TitleMixin, UpdateView):
     form_class = TaskCreationForm
     title = 'Просмотр и изменение задачи'
     template_name = 'task/task.html'
@@ -92,7 +92,7 @@ class TaskUpdateView(LoginRequiredMixin, UserEntityMixin, TitleMixin, UpdateView
         return Task.from_domain(self.use_case.get_user_task_by_id(task_id=self.kwargs.get('task_id'), user=self.get_user_entity()))
 
 
-class CategoryUpdateView(LoginRequiredMixin, UserEntityMixin, TitleMixin, UpdateView):
+class CategoryUpdateView(LoginRequiredMixinWithRedirectMessage, UserEntityMixin, TitleMixin, UpdateView):
     form_class = CategoryCreationForm
     title = 'Просмотр и изменение категории'
     template_name = 'task/category.html'
@@ -124,7 +124,7 @@ class CategoryUpdateView(LoginRequiredMixin, UserEntityMixin, TitleMixin, Update
         return context
         
 
-class CategoryDeletionView(LoginRequiredMixin, UserEntityMixin, DeleteView):
+class CategoryDeletionView(LoginRequiredMixinWithRedirectMessage, UserEntityMixin, DeleteView):
     model = Category
     success_url = reverse_lazy('task:my_tasks')
     use_case = TaskUseCase(category_database_repository=CategoryDatabaseRepository(Category))
@@ -152,7 +152,7 @@ class CategoryDeletionView(LoginRequiredMixin, UserEntityMixin, DeleteView):
         return Category.from_domain(self.use_case.get_user_category_by_id(self.kwargs.get('category_id'), self.get_user_entity()))
     
 
-class CategoriesView(LoginRequiredMixin, UserEntityMixin, TitleMixin, TemplateView):
+class CategoriesView(LoginRequiredMixinWithRedirectMessage, UserEntityMixin, TitleMixin, TemplateView):
     template_name = 'task/categories.html'
     title = 'Категории'
     use_case = TaskUseCase(category_database_repository=CategoryDatabaseRepository(Category))
@@ -164,7 +164,7 @@ class CategoriesView(LoginRequiredMixin, UserEntityMixin, TitleMixin, TemplateVi
         return context
     
 
-class OrderUpdateView(LoginRequiredMixin, UserEntityMixin, View):
+class OrderUpdateView(LoginRequiredMixinWithRedirectMessage, UserEntityMixin, View):
     def get(self, request):
         return HttpResponseBadRequest('<h1>Bab Request</h1><p>Неправильный метод запроса</p>')
     
@@ -177,7 +177,7 @@ class OrderUpdateView(LoginRequiredMixin, UserEntityMixin, View):
         return HttpResponse('OK')
 
 
-class TaskCompletionView(LoginRequiredMixin, UserEntityMixin, TitleMixin, View):
+class TaskCompletionView(LoginRequiredMixinWithRedirectMessage, UserEntityMixin, TitleMixin, View):
     title = 'Подтверждение выполнения задачи'
 
 
@@ -206,7 +206,7 @@ class TaskCompletionView(LoginRequiredMixin, UserEntityMixin, TitleMixin, View):
         return HttpResponseRedirect(reverse_lazy('task:my_tasks'))
     
 
-class TaskFailView(LoginRequiredMixin, UserEntityMixin, TitleMixin, View): 
+class TaskFailView(LoginRequiredMixinWithRedirectMessage, UserEntityMixin, TitleMixin, View): 
     title = 'Подтверждение провала задачи'
 
 

@@ -33,25 +33,9 @@ main {
     width: auto;
 }
 
-.task-item-done {
-    display: block;
-    margin-left: auto;
-}
-
-.task-item-done a{
-    text-decoration: none;
-    font-size: 21pt;
-    text-decoration: none;
-    color: green;
-    transition: all 0.3s ease;
-}
-
-.task-item-done a:hover{
-    color: rgb(8, 69, 8);
-}
 
 .task-item-delete {
-    margin-left: 20px;
+    margin-left: auto;
     margin-right: 10px;
 }
 
@@ -66,42 +50,6 @@ main {
 .task-item-delete a:hover {
     color: rgb(127, 5, 5);
 }
-
-.task-item-add {
-    border:3px dashed #ccc; 
-    border-radius: 10px;
-    margin: 10px;
-    padding: 16px;
-    width: 845px;
-    text-align: center;
-    transition: all 0.3s ease;
-}
-
-.task-item-add:hover {
-    box-shadow: 3px 3px 3px gray;
-    text-shadow: 3px 3px 2px rgb(82, 82, 82);
-
-}
-
-
-.task-item-add i {
-    font-size: 16pt;
-    padding: 4px;
-    border: 3px dashed #ccc;
-    border-radius: 20px;
-}
-
-.task-item-add p {
-    margin-top: 8px;
-}
-
-.task-item-add a {
-    text-decoration: none;
-    color: #ccc;
-
-}
-
-
 
 
 aside {

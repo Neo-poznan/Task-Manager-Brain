@@ -29,14 +29,30 @@
 
     </main>
     <aside>
-        <div class="calendar-wrapper">
-            <h2>Запланированные дедлайны</h2>
-            <button id="btnPrev" type="button">Предыдущий</button>
-            <button id="btnNext" type="button">Следующий</button>
-        <div id="divCal"></div>
-        
+        <h1>Дедлайны</h1>
+        <div id="calendarContainer">
+            
+            <div id="scrollWrapper">
+                <div class="month"><div class="calendar-wrapper"></div></div>
+                <div class="month"><div class="calendar-wrapper"></div></div>
+                <div class="month"><div class="calendar-wrapper"></div></div>
+                <div class="month"><div class="calendar-wrapper"></div></div>
+                <div class="month"><div class="calendar-wrapper"></div></div>
+                <div class="month"><div class="calendar-wrapper"></div></div>
+                <div class="month"><div class="calendar-wrapper"></div></div>
+                <div class="month"><div class="calendar-wrapper"></div></div>
+                <div class="month"><div class="calendar-wrapper"></div></div>
+                <div class="month"><div class="calendar-wrapper"></div></div>
+                <div class="month"><div class="calendar-wrapper"></div></div>
+                <div class="month"><div class="calendar-wrapper"></div></div>
+                <div class="month"><div class="calendar-wrapper"></div></div>
+            </div>
+            <div id="buttonContainer">
+                <button id="btnPrev">Previous</button>
+                <button id="btnNext">Next</button>
+            </div>
         </div>
-            <div id="chartContainer">
+        <div id="chartContainer">
             <h2>Мои категории</h2>
             <br>
             <canvas id="chart"></canvas>
@@ -49,6 +65,7 @@
     let calendar_data = JSON.parse('{{ calendar_data|escapejs }}')
     let csrftoken = '{{ csrf_token }}'
     let ordersUpdateUrl = "{% url 'task:order_update' %}"
+    
 </script>
 <script src="{% static 'js/calendar.js' %}"></script>
 <script src="{% static 'js/current_tasks_chart.js' %}"></script>

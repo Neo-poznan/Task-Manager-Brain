@@ -9,43 +9,17 @@
 {% block content %}
     <div id="container">
         <main>
-                        <div id="task-list">
-                    <div class="task-item" draggable="true" id="task1">
-                        <div class="task-item-name"><p>Задача 1</p></div>
-                        <div class="task-item-done"><a href=""><i class="ri-check-line"></i></a></div>
+            {% for task in history %}
+            <div id="task-list">
+                <div class="task-item">
+                    <div class="task-item-name"><p>{{ task.name }}</p></div>
+                    {% if task.id %}
                         <div class="task-item-delete"><a href=""><i class="ri-delete-bin-6-line"></i></a></div>
-                    </div>
-                    <div class="task-item" draggable="true" id="task2">
-                        <div class="task-item-name"><p>Задача 2</p></div>
-                        <div class="task-item-done"><a href=""><i class="ri-check-line"></i></a></div>
-                        <div class="task-item-delete"><a href=""><i class="ri-delete-bin-6-line"></i></a></div>
+                    {% endif %}
 
-                    </div>
-                    <div class="task-item" draggable="true" id="task3">
-                        <div class="task-item-name"><p>Задача 3</p></div>
-                        <div class="task-item-done"><a href=""><i class="ri-check-line"></i></a></div>
-                        <div class="task-item-delete"><a href=""><i class="ri-delete-bin-6-line"></i></a></div>
-
-                    </div>
-                    <div class="task-item" draggable="true" id="task4">
-                        <div class="task-item-name"><p>Задача 4</p></div>
-                        <div class="task-item-done"><a href=""><i class="ri-check-line"></i></a></div>
-                        <div class="task-item-delete"><a href=""><i class="ri-delete-bin-6-line"></i></a></div>
-
-                    </div>
-                    <div class="task-item" draggable="true" id="task5">
-                        <div class="task-item-name"><p>Задача 5</p></div>
-                        <div class="task-item-done"><a href=""><i class="ri-check-line"></i></a></div>
-                        <div class="task-item-delete"><a href=""><i class="ri-delete-bin-6-line"></i></a></div>
-
-                    </div>
-                    <div class="task-item-add">
-                        <a href="#">
-                            <i class="ri-add-large-line"></i>
-                            <p>Добавить задачу</p>
-                        </a> 
-                    </div>
-                </div> 
+                </div>
+            </div> 
+            {% endfor %}
 
         </main>
         <aside>

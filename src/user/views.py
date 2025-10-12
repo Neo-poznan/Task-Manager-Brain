@@ -1,11 +1,11 @@
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from django.views.generic import CreateView, UpdateView
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden, JsonResponse
+from django.contrib import messages
 
 from .forms import UserRegistrationForm, UserLoginForm, UserProfileForm, UserPasswordChangeForm, UserPasswordResetForm, UserPasswordResetConfirmForm
-from task.mixins import TitleMixin
+from task.mixins import TitleMixin, LoginRequiredMixinWithRedirectMessage
 
 
 class UserRegistrationView(TitleMixin, CreateView):
@@ -25,10 +25,11 @@ class UserLoginView(TitleMixin, LoginView):
 
 
     def get_success_url(self):
+        messages.info(self.request, '<div class="success-icon-container"><i class="ri-check-line" id="success-icon"></i></div><h1>Вы успешно вошли в аккаунт и можете пользоваться приложением! Это - страница кастомизации!</h1><a href="/" class="modal-link">На главную</a>')
         return reverse_lazy('user:profile')
 
 
-class UserProfileView(TitleMixin, LoginRequiredMixin, UpdateView):
+class UserProfileView(TitleMixin, LoginRequiredMixinWithRedirectMessage, UpdateView):
     form_class = UserProfileForm
     template_name = 'user/profile.html'
     title = 'Профиль'
@@ -42,7 +43,7 @@ class UserProfileView(TitleMixin, LoginRequiredMixin, UpdateView):
         return reverse_lazy('user:profile')
 
 
-class UserPasswordChangeView(TitleMixin, LoginRequiredMixin, PasswordChangeView):
+class UserPasswordChangeView(TitleMixin, LoginRequiredMixinWithRedirectMessage, PasswordChangeView):
     form_class = UserPasswordChangeForm
     template_name = 'user/password_change.html'
     title = 'Смена пароля'
@@ -52,7 +53,7 @@ class UserPasswordChangeView(TitleMixin, LoginRequiredMixin, PasswordChangeView)
         return reverse_lazy('user:password_change_done')
     
 
-class UserPasswordChangeDoneView(TitleMixin, PasswordChangeDoneView):
+class UserPasswordChangeDoneView(TitleMixin, PasswordChangeDoneView, LoginRequiredMixinWithRedirectMessage):
     template_name = 'user/password_change_done.html'
     title = 'Успешно'
 

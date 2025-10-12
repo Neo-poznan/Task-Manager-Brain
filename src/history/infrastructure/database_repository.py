@@ -9,6 +9,7 @@ from ..models import History
 from task.models import Task
 from task.domain.entities import TaskEntity
 from user.domain.entities import UserEntity
+from ..domain.entities import IncompleteHistoryEntity
 
 
 class HistoryDatabaseRepositoryInterface(ABC):
@@ -66,6 +67,10 @@ class HistoryDatabaseRepositoryInterface(ABC):
     def get_count_user_successful_planned_tasks_by_categories(self, user: UserEntity) -> list[tuple[str, int]]:
         pass
 
+    @abstractmethod
+    def get_user_history(self, user: UserEntity) -> list[IncompleteHistoryEntity]:
+        pass
+
 
 class HistoryDatabaseRepository(HistoryDatabaseRepositoryInterface):
     def __init__(self, task_model: Task, history_model: History, connection: ConnectionProxy):
@@ -116,7 +121,7 @@ class HistoryDatabaseRepository(HistoryDatabaseRepositoryInterface):
             )
         
     
-    def get_count_user_tasks_in_categories(self, user: UserEntity) -> list[tuple[int, str]]:
+    def get_count_user_tasks_in_categories(self, user: UserEntity, from_date: str, to_date: str) -> list[tuple[int, str]]:
         cursor = self._connection.cursor()
         cursor.execute(
             '''
@@ -124,16 +129,17 @@ class HistoryDatabaseRepository(HistoryDatabaseRepositoryInterface):
             FROM history_history hh
             JOIN task_category tc
             ON hh.category_id = tc.id
-            WHERE hh.user_id = %s
+            WHERE hh.user_id = %s AND
+            execution_date BETWEEN %s AND %s
             GROUP BY tc.name, tc.color
             ORDER BY count(hh.id);
             ''',
-            [user.id]
+            [user.id, from_date, to_date]
         )
         return cursor.fetchall()
 
     
-    def get_common_user_accuracy(self, user: UserEntity) -> list[tuple[Decimal]]:
+    def get_common_user_accuracy(self, user: UserEntity, from_date: str, to_date: str) -> list[tuple[Decimal]]:
         cursor = self._connection.cursor()
         cursor.execute(
             '''
@@ -145,14 +151,16 @@ class HistoryDatabaseRepository(HistoryDatabaseRepositoryInterface):
                 WHEN planned_time > execution_time THEN (extract(epoch FROM execution_time) / extract(epoch FROM planned_time)) * 100
             END), 2) AS accuracy
             FROM history_history
-            WHERE user_id = %s;
+            WHERE user_id = %s
+            AND
+            execution_date BETWEEN %s AND %s;;
             ''',
-            [user.id]
+            [user.id, from_date, to_date]
         )
         return cursor.fetchall()
 
 
-    def get_user_accuracy_by_categories(self, user: UserEntity) -> list[tuple[str, Decimal]]:
+    def get_user_accuracy_by_categories(self, user: UserEntity, from_date: str, to_date: str) -> list[tuple[str, Decimal]]:
         cursor = self._connection.cursor()
         cursor.execute(
             '''
@@ -167,48 +175,50 @@ class HistoryDatabaseRepository(HistoryDatabaseRepositoryInterface):
             FROM history_history hh
             JOIN task_category tc
             ON hh.category_id = tc.id
-            WHERE hh.user_id = %s
+            WHERE hh.user_id = %s AND
+            execution_date BETWEEN %s AND %s
             GROUP BY category_id, tc."name", tc.color
             ORDER BY accuracy;
             ''',
-            [user.id]
+            [user.id, from_date, to_date]
         )
         return cursor.fetchall()
 
 
-    def get_user_common_success_rate(self, user: UserEntity) -> list[tuple[Decimal]]:
+    def get_user_common_success_rate(self, user: UserEntity, from_date: str, to_date: str) -> list[tuple[Decimal]]:
         cursor = self._connection.cursor()
         cursor.execute(
             '''
-            SELECT count(*)-(SELECT count(*) FROM history_history hh2 WHERE hh2.status='FAILED' AND hh2.user_id = %s) AS successful_tasks,
-            (SELECT count(*) FROM history_history hh3 WHERE hh3.status='FAILED' AND hh3.user_id = %s) AS failed_tasks 
+            SELECT count(*)-(SELECT count(*) FROM history_history hh2 WHERE hh2.status='FAILED' AND hh2.user_id = %s AND execution_date BETWEEN %s AND %s) AS successful_tasks,
+            (SELECT count(*) FROM history_history hh3 WHERE hh3.status='FAILED' AND hh3.user_id = %s AND execution_date BETWEEN %s AND %s) AS failed_tasks 
             FROM history_history hh
-            WHERE hh.user_id = %s;
+            WHERE hh.user_id = %s AND execution_date BETWEEN %s AND %s;
             ''',
-            [user.id, user.id, user.id]
+            [user.id, from_date, to_date, user.id, from_date, to_date, user.id, from_date, to_date]
         )
         return cursor.fetchall()
 
 
-    def get_user_success_rate_by_categories(self, user: UserEntity) -> list[tuple[str, float]]:
+    def get_user_success_rate_by_categories(self, user: UserEntity, from_date: str, to_date: str) -> list[tuple[str, float]]:
         cursor = self._connection.cursor()
         cursor.execute(
             '''
             SELECT
             tc."name", tc.color,
-            count(*)-(SELECT count(*) FROM history_history hh2 WHERE hh2.status='FAILED' AND hh2.category_id=hh.category_id AND hh2.user_id = %s) AS successful_tasks
+            count(*)-(SELECT count(*) FROM history_history hh2 WHERE hh2.status='FAILED' AND hh2.category_id=hh.category_id AND hh2.user_id = %s AND execution_date BETWEEN %s AND %s) AS successful_tasks
             FROM history_history hh 
             join task_category tc 
             ON hh.category_id = tc.id
-            WHERE hh.user_id = %s
+            WHERE hh.user_id = %s AND
+            execution_date BETWEEN %s AND %s
             GROUP BY category_id, tc."name", tc.color;
             ''',
-            [user.id, user.id]
+            [user.id, from_date, to_date, user.id, from_date, to_date]
         )
         return cursor.fetchall()
 
 
-    def get_count_user_tasks_by_weekdays(self, user: UserEntity) -> list[tuple[str, int]]:
+    def get_count_user_tasks_by_weekdays(self, user: UserEntity, from_date: str, to_date: str) -> list[tuple[str, int]]:
         cursor = self._connection.cursor()
         cursor.execute(
             '''
@@ -222,31 +232,33 @@ class HistoryDatabaseRepository(HistoryDatabaseRepositoryInterface):
                 (7, 'Воскресенье')
             ) weekdays(day_index, day_name)
             LEFT join history_history hh ON day_index=extract(isodow FROM hh.execution_date)
-            WHERE hh.user_id = %s
+            WHERE hh.user_id = %s AND
+            execution_date BETWEEN %s AND %s
             GROUP BY day_index, day_name
             ORDER BY day_index;
             ''',
-            [user.id]
+            [user.id, from_date, to_date]
         )
         return cursor.fetchall()
 
 
-    def get_common_count_user_successful_planned_tasks(self, user: UserEntity) -> list[tuple[int]]:
+    def get_common_count_user_successful_planned_tasks(self, user: UserEntity, from_date: str, to_date: str) -> list[tuple[int]]:
         cursor = self._connection.cursor()
         cursor.execute(
             '''
             SELECT
-            (SELECT count(hh2.id) FROM history_history hh2 WHERE hh2.user_id = %s AND hh2.planned_time = hh2.execution_time) AS successful_planning,
+            (SELECT count(hh2.id) FROM history_history hh2 WHERE hh2.user_id = %s AND hh2.planned_time = hh2.execution_time AND execution_date BETWEEN %s AND %s) AS successful_planning,
             count(hh.id) AS failed_planning
             FROM history_history hh 
-            WHERE hh.user_id = %s AND hh.planned_time != hh.execution_time; 
+            WHERE hh.user_id = %s AND hh.planned_time != hh.execution_time AND
+            execution_date BETWEEN %s AND %s; 
             ''',
-            [user.id, user.id]
+            [user.id, from_date, to_date, user.id, from_date, to_date]
         )
         return cursor.fetchall()
 
     
-    def get_count_user_successful_planned_tasks_by_categories(self, user: UserEntity) -> list[tuple[str, int]]:
+    def get_count_user_successful_planned_tasks_by_categories(self, user: UserEntity, from_date: str, to_date: str) -> list[tuple[str, int]]:
         cursor = self._connection.cursor()
         cursor.execute(
             '''
@@ -257,10 +269,26 @@ class HistoryDatabaseRepository(HistoryDatabaseRepositoryInterface):
             from history_history hh 
             JOIN task_category tc 
             ON tc.id = hh.category_id 
-            WHERE hh.user_id = %s AND hh.planned_time = hh.execution_time
+            WHERE hh.user_id = %s AND hh.planned_time = hh.execution_time AND
+            execution_date BETWEEN %s AND %s
             GROUP BY hh.category_id, tc."name", tc.color;
             ''',
-            [user.id]
+            [user.id, from_date, to_date]
         )
         return cursor.fetchall()
+    
+
+    def get_user_history(self, user: UserEntity, from_date: str, to_date: str) -> list[IncompleteHistoryEntity]:
+        cursor = self._connection.cursor()
+        cursor.execute(
+            '''
+            SELECT hh.id, hh.name
+            FROM history_history hh
+            WHERE hh.user_id = %s AND
+            execution_date BETWEEN %s AND %s
+            ORDER BY hh.execution_date DESC;
+            ''',
+            [user.id, from_date, to_date]
+        )
+        return [IncompleteHistoryEntity(id=string[0], name=string[1]) for string in cursor.fetchall()]
 

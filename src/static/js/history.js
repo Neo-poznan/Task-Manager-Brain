@@ -262,7 +262,7 @@ const commonCountUserSuccessfulPlannedTasksCTX = document.getElementById('common
 
 const commonCountUserSuccessfulPlannedTasksChartData = {
   datasets: [{
-    label: 'Правильно спланированные задачи',
+    label: 'Правильно спланировано',
     data: commonCountUserSuccessfulPlannedTasks.data,
     backgroundColor: commonCountUserSuccessfulPlannedTasks.colors,
     hoverOffset: 4

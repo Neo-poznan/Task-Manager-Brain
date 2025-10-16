@@ -14,8 +14,12 @@ body {
 header {
     border-bottom: 5px solid rgb(53, 53, 53);
     background-color: rgb(20, 20, 20);
-    height: 120px;
     display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    row-gap: 30px;
 }
 
 header * {
@@ -26,11 +30,12 @@ header * {
 #logo-url {
     text-decoration: none;
     position: relative;
+    margin-left: 4vw;
 }
 
 #logo-container {
     display: flex;
-    margin-left: 4vw;
+    
     text-wrap: nowrap;
     color: white;
 }
@@ -70,16 +75,33 @@ header * {
 }
 
 header nav {
-    display: inline-block;
-    margin-left: 15vw;
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
     text-wrap: nowrap;
+    width: auto;
+    column-gap: 37vw;
+    flex-wrap: wrap-reverse;
+    justify-content: center;
+    row-gap: 20px;
+}
+
+.auth-nav {
+    margin-left: 20vw;
+    margin-right: auto;
+}
+
+
+.nav-links {
+    display: flex;
+    gap: 2vw;
 }
 
 header nav a {
     color: gray;
     font-size: 20pt;
-    margin-left: 100px;
     transition: all 0.3s ease;
+    margin-left: 1vw;
 }
 
 .modal-link {
@@ -94,8 +116,9 @@ header nav a:hover, .modal-link:hover {
 }
 
 #user-info {
-    display: inline-flex;
-    margin-left: 40vw;
+    display: flex;
+    margin-right: 30px;
+    
 }
 
 #user-info button {
@@ -106,6 +129,7 @@ header nav a:hover, .modal-link:hover {
     color: gray;
     text-decoration: underline;
     transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 #user-info button:hover {
@@ -148,7 +172,7 @@ header nav a:hover, .modal-link:hover {
 .show {display:block;}
 
 
-#modalContainer, #modalContainerMessages {
+#modalContainer, #modalContainerMessages, #modalContainerShareHistory {
     width:100%;
     height:100%;
     display:none;
@@ -159,16 +183,11 @@ header nav a:hover, .modal-link:hover {
     background:rgba(0,0,0,0.85);
 }
 
-.modal, .modal-messages {
+.modal, .modal-messages, .modal-share-history {
     transform:translate(-50%, -50%) scale(0.5);
     position:absolute;
     top:50%;
     left:50%;
-    border-radius:3px;
-    border: 3px solid gray;
-    border-radius: 20px;
-
-
     --bgColor: rgb(15, 15, 15);
     --borderGradient: linear-gradient(
         to right bottom, rgb(38, 58, 213), rgb(90, 38, 213), rgb(119, 37, 190), rgb(73, 7, 91)
@@ -186,6 +205,11 @@ header nav a:hover, .modal-link:hover {
 .modal-content {
     text-align: center;
     padding: 70px;
+}
+
+.share-history-info {
+    color: white;
+    margin-bottom: 30px;
 }
 
 .transform-in, .transform-out {
@@ -245,7 +269,6 @@ header nav a:hover, .modal-link:hover {
     background: linear-gradient(
         to right bottom, rgb(38, 58, 213), rgb(90, 38, 213), rgb(96, 27, 156), rgb(73, 7, 91)
     );
-    margin-left: auto;
     border: none;
     width: 200px;
     height: 55px;
@@ -256,7 +279,31 @@ header nav a:hover, .modal-link:hover {
     margin-left: auto;
     margin-right: 50px;
     transition: all 0.3s ease;
+    cursor: pointer;
 }
+
+#shareButton {
+    background: linear-gradient(
+        to right bottom, rgb(38, 58, 213), rgb(90, 38, 213), rgb(96, 27, 156), rgb(73, 7, 91)
+    );
+    border: none;
+    width: 220px;
+    height: 55px;
+    border-radius: 40px;
+    color: white;
+    font-size: 14pt;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    transition: all 0.3s ease; 
+    cursor: pointer;
+}
+
+#shareButton:hover {
+    background-color: rgb(47, 26, 108);
+    box-shadow: 1px 1px 1px 1px rgb(71, 71, 71);
+}
+
 
 #historyForm button:hover {
     background-color: rgb(47, 26, 108);
@@ -338,6 +385,7 @@ header nav a:hover, .modal-link:hover {
     margin-right: 20px;
     background-color: transparent;
     border: none;    
+    cursor: pointer;
 }
 
 .skip-button:hover {
@@ -350,4 +398,10 @@ header nav a:hover, .modal-link:hover {
     font-size: 30pt;
 }
 
+@media screen and (max-width: 1530px) {
+    header nav {
+        column-gap: 10vw;
+    }
+    
+}
 

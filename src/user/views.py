@@ -3,6 +3,9 @@ from django.views.generic import CreateView, UpdateView
 from django.urls import reverse_lazy
 from django.http import HttpResponseForbidden, JsonResponse
 from django.contrib import messages
+from django.shortcuts import resolve_url
+from django.conf import settings
+
 
 from .forms import UserRegistrationForm, UserLoginForm, UserProfileForm, UserPasswordChangeForm, UserPasswordResetForm, UserPasswordResetConfirmForm
 from task.mixins import TitleMixin, LoginRequiredMixinWithRedirectMessage
@@ -13,7 +16,6 @@ class UserRegistrationView(TitleMixin, CreateView):
     template_name = 'user/registration.html'
     title = 'Регистрация'
 
-
     def get_success_url(self):
         return reverse_lazy('user:login')
 
@@ -23,10 +25,26 @@ class UserLoginView(TitleMixin, LoginView):
     template_name = 'user/login.html'
     title = 'Аутентификация'
 
-
     def get_success_url(self):
-        messages.info(self.request, '<div class="success-icon-container"><i class="ri-check-line" id="success-icon"></i></div><h1>Вы успешно вошли в аккаунт и можете пользоваться приложением! Это - страница кастомизации!</h1><a href="/" class="modal-link">На главную</a>')
-        return reverse_lazy('user:profile')
+        next_page = self.get_next_page()
+        if not next_page:
+            self.alert_message(
+                '''
+                <div class="success-icon-container">
+                    <i class="ri-check-line" id="success-icon"></i>
+                </div>
+                <h1>Вы успешно вошли в аккаунт и можете пользоваться приложением! Это - страница кастомизации!</h1>
+                <a href="/" class="modal-link">На главную</a>
+                '''
+            )
+            return settings.LOGIN_REDIRECT_URL
+        return resolve_url(self.get_next_page())
+
+    def alert_message(self, message: str):
+        messages.info(self.request, message)
+
+    def get_next_page(self):
+        return self.request.GET.get('next')
 
 
 class UserProfileView(TitleMixin, LoginRequiredMixinWithRedirectMessage, UpdateView):
@@ -34,10 +52,8 @@ class UserProfileView(TitleMixin, LoginRequiredMixinWithRedirectMessage, UpdateV
     template_name = 'user/profile.html'
     title = 'Профиль'
 
-
     def get_object(self, queryset = ...):
         return self.request.user
-    
 
     def get_success_url(self):
         return reverse_lazy('user:profile')
@@ -47,7 +63,6 @@ class UserPasswordChangeView(TitleMixin, LoginRequiredMixinWithRedirectMessage, 
     form_class = UserPasswordChangeForm
     template_name = 'user/password_change.html'
     title = 'Смена пароля'
-
 
     def get_success_url(self):
         return reverse_lazy('user:password_change_done')
@@ -68,7 +83,6 @@ class UserPasswordResetView(TitleMixin, PasswordResetView):
     email_template_name = 'user/password_reset_message.html'
     title = 'Сброс пароля'
 
-
     def get_success_url(self):
         return reverse_lazy('user:password_reset_done')
 
@@ -83,10 +97,8 @@ class UserPasswordResetConfirmView(TitleMixin, PasswordResetConfirmView):
     template_name = 'user/password_reset_confirm.html'
     title = 'Сброс пароля'
 
-
     def get_success_url(self):
         return reverse_lazy('user:password_reset_complete')
-    
 
     def render_to_response(self, context, **response_kwargs):
         '''

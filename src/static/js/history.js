@@ -286,3 +286,70 @@ const commonCountUserSuccessfulPlannedTasksConfig = {
 }
 
 new Chart(commonCountUserSuccessfulPlannedTasksCTX, commonCountUserSuccessfulPlannedTasksConfig)
+
+function getQueryParam(name){
+   if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
+      return decodeURIComponent(name[1]);
+}
+
+function showDates() {
+    const from_date = new Date(getQueryParam('from_date')).toLocaleString('ru-RU', {
+        year: 'numeric', month: 'long', day: 'numeric'
+    }); 
+    const to_date = new Date(getQueryParam('to_date')).toLocaleString('ru-RU', {
+        year: 'numeric', month: 'long', day: 'numeric'
+    });
+    document.getElementById('historyDates').innerText = from_date + ' - ' + to_date;
+}
+
+function shareHistory() {
+    const from_date = getQueryParam('from_date');
+    const to_date = getQueryParam('to_date');
+    const url = window.location
+    let modal = document.getElementById('modalShareHistory');    
+    fetch(`/history/share/?from_date=${from_date}&to_date=${to_date}`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'X-CSRFToken': csrf_token // Установка CSRF-токена в заголовок
+            },
+    })
+    .then(response => response.json())
+    .then(response => {
+            modal.innerHTML = `
+                <div class="skip-button-container">
+                    <button id="modalShareHistorySkip" class="skip-button" onclick="closeModalShareHistory()"><i class="ri-close-large-line close-icon" id="modalShareHistoryCloseIcon"></i></button>
+                </div>
+                <div class="modal-content">
+                    <h1 class="share-history-info">История сохранена по этой ссылке:</h1>
+                    <p class="share-history-info" id="readyLink">${url.protocol}://${url.host}/history/share/?key=${response.key}</p>
+                    <button id="copyLinkButton" onclick="copyLink(event)" class="copy-link-button"><i class="ri-file-copy-line"></i></button>
+                </div>
+            `
+    })
+    .catch(error => {
+        modal.innerHTML = `
+            <div class="skip-button-container">
+                <button id="modalShareHistorySkip" class="skip-button" onclick="closeModalShareHistory()"><i class="ri-close-large-line close-icon" id="modalShareHistoryCloseIcon"></i></button>
+            </div>
+            <div class="modal-content">            
+                <h1 class="share-history-info">${error}</h1>          
+            </div>      
+        
+        `     
+    })
+}
+
+function copyLink(e) {
+    e.preventDefault()
+    const linkElement = document.getElementById('readyLink');
+    navigator.clipboard.writeText(linkElement.innerHTML)
+    .then(() => {
+        e.target.parentElement.classList.add('copied');
+        e.target.parentElement.innerHTML = '<p style="color: white;">Скопировано<i class="ri-check-line" style="color: green;"></i></p>';
+        e.target.parentElement.style.transition = 'all 0.3s ease';
+    })
+    .catch(error => {
+        console.log(error);
+    })
+}

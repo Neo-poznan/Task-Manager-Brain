@@ -153,5 +153,7 @@ AUTHENTICATION_BACKENDS = [
 
 LOGIN_URL = reverse_lazy('user:login')
 
+LOGIN_REDIRECT_URL = reverse_lazy('user:profile')
+
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 

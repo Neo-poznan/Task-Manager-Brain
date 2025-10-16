@@ -4,12 +4,55 @@ const scrollRightButton = document.getElementById('btnNext');
 
 let currentIndex = 1;
 
+function dropDownCalendarMark(event, message) {
+  event.preventDefault();
+  const element = document.getElementById('calendarModalContent');
+  element.innerHTML = message;
+  element.parentElement.classList.toggle('show')
+
+}
+
+function escapeHtml(str) {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+
 // Функция для создания нового контента
 function createNewContent() {
     const newContent = document.createElement('div');
     newContent.classList.add('month');
     newContent.innerHTML = '<div class="calendar-wrapper"></div>';
     return newContent;
+}
+
+function createCalendarMark(deadlinesOnCurrentDate, deadlinesCount, deadline) {
+    let message = ''
+    const pretty_deadline = deadline.toLocaleString('ru-RU', {year: 'numeric', month: 'long', day: 'numeric'});
+    const count = String(deadlinesOnCurrentDate[deadlinesCount]['count'])
+    if (['11', '12', '13', '14'].includes(count)) {
+        message = `<h2>На ${pretty_deadline} у вас запланировано ${deadlinesOnCurrentDate[deadlinesCount]['count']} задач в категории ${deadlinesOnCurrentDate[deadlinesCount]['category'].toLowerCase()}</h2>`
+    }
+    else if (count.endsWith('1')) {
+        message = `<h2>На ${pretty_deadline} у вас запланирована ${deadlinesOnCurrentDate[deadlinesCount]['count']} задача в категории ${deadlinesOnCurrentDate[deadlinesCount]['category'].toLowerCase()}</h2>`
+    }
+    else if (count.endsWith('2') || count.endsWith('3') || count.endsWith('4')) {
+        message = `<h2>На ${pretty_deadline} у вас запланированы ${deadlinesOnCurrentDate[deadlinesCount]['count']} задачи в категории ${deadlinesOnCurrentDate[deadlinesCount]['category'].toLowerCase()}</h2>`
+    }
+    else {
+        message = `<h2>На ${pretty_deadline} у вас запланировано ${deadlinesOnCurrentDate[deadlinesCount]['count']} задач в категории ${deadlinesOnCurrentDate[deadlinesCount]['category'].toLowerCase()}</h2>`
+    }
+    escapedMessage = escapeHtml(message);
+    const html = `
+        <button onclick="dropDownCalendarMark(event, '${escapedMessage}')" class="calendar-mark-button" id="" title="У вас запланировано следующее количество задач в категории ${deadlinesOnCurrentDate[deadlinesCount]['category']}: ${deadlinesOnCurrentDate[deadlinesCount]['count']}" style="background-color: ${deadlinesOnCurrentDate[deadlinesCount]['color']};"></button>
+
+    `
+    return html
+
 }
 
 
@@ -115,10 +158,10 @@ var Cal = function() {
                 let deadlinesHtml = ''
                 if (deadlinesOnCurrentDate) {
                     for(let deadlinesCount=0; deadlinesCount < deadlinesOnCurrentDate.length; deadlinesCount++) {
-                        deadlinesHtml += `<button title="У вас запланировано следующее количество задач по категории ${deadlinesOnCurrentDate[deadlinesCount]['category']}: ${deadlinesOnCurrentDate[deadlinesCount]['count']}" class="calendar-mark" style="background-color: ${deadlinesOnCurrentDate[deadlinesCount]['color']};"></button>`
+                        deadlinesHtml += createCalendarMark(deadlinesOnCurrentDate, deadlinesCount, new Date(this.currYear, this.currMonth, i));
                     }                    
                 }
-                html += '<td class="today">' + i + deadlinesHtml+ '</td>';
+                html += '<td class="normal"">' + i + '<div class="deadlines-container">' + deadlinesHtml + '</div>' + '</td>';
 
             }
             else {
@@ -126,11 +169,11 @@ var Cal = function() {
                 let deadlinesHtml = ''
                 if (deadlinesOnCurrentDate) {
                     for(let deadlinesCount=0; deadlinesCount < deadlinesOnCurrentDate.length; deadlinesCount++) {
-                        deadlinesHtml += `<button title="У вас запланировано следующее количество задач по категории ${deadlinesOnCurrentDate[deadlinesCount]['category']}: ${deadlinesOnCurrentDate[deadlinesCount]['count']}" class="calendar-mark" style="background-color: ${deadlinesOnCurrentDate[deadlinesCount]['color']};"></button>`
+                        deadlinesHtml += createCalendarMark(deadlinesOnCurrentDate, deadlinesCount, new Date(this.currYear, this.currMonth, i));
                     }                    
                 }
 
-                html += '<td class="normal"">' + i + deadlinesHtml + '</td>';
+                html += '<td class="normal"">' + i + '<div class="deadlines-container">' + deadlinesHtml + '</div>' + '</td>';
                      
             }
             // закрыть строку в воскресенье
@@ -221,7 +264,7 @@ window.onload = function() {
                 divs = document.getElementsByClassName('calendar-wrapper');
                 contentWrapper.style.transition = 'none';
                 contentWrapper.style.transform = 'translateX(-6000px)';    
-            }   
+            }
         }, { once: true });
     });
 

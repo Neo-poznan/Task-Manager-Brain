@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 
 class UserTest(TestCase):
+
     def _user_registration(self, credentials: dict[str, str]):
         response = self.client.post('/user/registration/', credentials)
         return response
@@ -31,7 +32,6 @@ class UserTest(TestCase):
     
     def _clear_database(self):
         get_user_model().objects.first().delete()
-
 
     def test_user(self):
         credentials = {

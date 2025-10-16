@@ -7,6 +7,7 @@ from user.models import User
 
 
 class DomainQuerySet(models.QuerySet):
+
     def to_entity_list(self) -> list[TaskEntity]:
         return [task.to_domain() for task in self]
 
@@ -30,7 +31,6 @@ class Category(models.Model):
             user=User.from_domain(entity.user) if entity.user else None,
             is_custom=entity.is_custom
         )
-    
 
     def to_domain(self) -> CategoryEntity:
         return CategoryEntity(
@@ -41,7 +41,6 @@ class Category(models.Model):
             user=self.user.to_domain() if self.user else None,
             is_custom=self.is_custom
         )
-
 
     def __str__(self):
         return self.name
@@ -62,7 +61,6 @@ class Task(models.Model):
 
     objects = DomainQuerySet.as_manager()
 
-
     @classmethod
     def from_domain(cls, entity: TaskEntity):
         return cls(
@@ -75,7 +73,6 @@ class Task(models.Model):
             deadline=entity.deadline,
             planned_time=entity.planned_time
         )
-
 
     def to_domain(self) -> TaskEntity:
         return TaskEntity(

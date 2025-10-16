@@ -13,6 +13,16 @@ window.onclick = function(event) {
       }
     }
   }
+  if (!event.target.matches('.calendar-mark-button')) {
+    let dropdowns = document.getElementsByClassName('calendar-modal');
+    let i;
+    for (i = 0; i < dropdowns.length; i++) {
+      let openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
 }
 
 $('#historyButton').click(function(e) {
@@ -65,3 +75,32 @@ $('#modalMessagesSkip').click(function(e) {
     e.preventDefault();
   }
 });
+
+function showShareHistoryModal() {
+  $('#modalContainerShareHistory').fadeIn(500);
+  $('.modal-share-history').removeClass('transform-out').addClass('transform-in');
+
+}
+
+$('#modalContainerShareHistory').click(function(e) {
+  if (e.target.id == 'modalContainerShareHistory') {
+    $('#modalContainerShareHistory').fadeOut(500);
+    $('.modal-share-history').removeClass('transform-in').addClass('transform-out');
+
+    e.preventDefault();
+  }
+});
+
+$('#modalShareHistorySkip').click(function(e) {
+  if (e.target.id == 'modalShareHistorySkip' || e.target.id == 'modalShareHistoryCloseIcon') {
+    $('#modalContainerShareHistory').fadeOut(500);
+    $('.modal-share-history').removeClass('transform-in').addClass('transform-out');
+
+    e.preventDefault();
+  }
+});
+
+function closeModalShareHistory() {
+  $('#modalContainerShareHistory').fadeOut(500);
+  $('.modal-share-history').removeClass('transform-in').addClass('transform-out');
+}

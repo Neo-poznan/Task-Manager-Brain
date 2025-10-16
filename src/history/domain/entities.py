@@ -1,3 +1,4 @@
+from datetime import date
 from dataclasses import dataclass
 
 from datetime import timedelta, date
@@ -22,4 +23,18 @@ class HistoryEntity:
 class IncompleteHistoryEntity:
     id: int
     name: str
+
+    def __iter__(self):
+        yield 'id', self.id
+        yield 'name', self.name
+
+
+@dataclass
+class SharedHistoryEntity:
+    key: int
+    user: UserEntity
+    from_date: date
+    to_date: date
+    history_statistics: dict
+
 

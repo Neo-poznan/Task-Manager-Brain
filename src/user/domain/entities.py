@@ -1,3 +1,4 @@
+from typing import Union
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -8,7 +9,19 @@ class UserEntity:
     username: str
     email: str
     password: str
+    avatar: str
     last_login: datetime
     is_active: bool
     date_joined: datetime
+
+
+@dataclass
+class IncompleteUserEntity:
+    id: int
+    username: str
+    avatar: str
+
+    def __eq__(self, value: Union[UserEntity, IncompleteUserEntity]):
+        if value.id and value.username and value.avatar:
+            return self.id == value.id
 

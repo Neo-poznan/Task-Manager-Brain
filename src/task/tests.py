@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from task.models import Task, Category
 from history.models import History
 
-class CompanyTest(TestCase):
+class TaskTest(TestCase):
 
     def _setUp(self):
         user = get_user_model().objects.create(
@@ -48,7 +48,7 @@ class CompanyTest(TestCase):
         return response    
 
     def _delete_category(self, category_id: int):
-        response = self.client.post(f'/delete-category/{category_id}/')
+        response = self.client.delete(f'/delete-category/{category_id}/')
         return response
 
     def _clear_database(self):
@@ -73,7 +73,7 @@ class CompanyTest(TestCase):
                 'description': 'test_description1',
                 'category': '1',
                 'planned_time': '2:51:10',
-                'deadline': '20.08.2025',
+                'deadline': '20.12.2025',
             },
              {
                 'name': 'test_task2',
@@ -140,13 +140,14 @@ class CompanyTest(TestCase):
         self.assertEqual(task_complete_response.status_code, 302)
         self.assertEqual(len(Task.objects.filter(id=2)), 0)
         self.assertEqual(len(History.objects.all()), 2)
+        print(History.objects.last().name)
         self.assertEqual(History.objects.last().status, History.SUCCESSFUL) 
 
         self._save_completed_task_to_history(Task.objects.get(id=3).id, '2:30:00')
         self.assertEqual(History.objects.last().status, History.OUT_OF_DEADLINE)     
 
         category_deletion_response = self._delete_category(Category.objects.last().id)
-        self.assertEqual(category_deletion_response.status_code, 302)
+        self.assertEqual(category_deletion_response.status_code, 203)
         self.assertEqual(len(Category.objects.all()), 9)
 
         self._clear_database()

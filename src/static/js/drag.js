@@ -5,6 +5,7 @@ let dragged;
 document.addEventListener("dragstart", function(event) {
     dragged = event.target;
     event.dataTransfer.setData('text/plain', null);
+
 });
 
 document.addEventListener("dragover", function(event) {
@@ -13,7 +14,6 @@ document.addEventListener("dragover", function(event) {
     if (target) {
         target.style.border = "4px dashed gray";
     }
-    
 });
 
 document.addEventListener("dragleave", function(event) {

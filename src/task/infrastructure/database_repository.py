@@ -14,16 +14,13 @@ class TaskDatabaseRepositoryInterface(ABC):
     def get_ordered_user_tasks(self, user: UserEntity) -> list[TaskEntity]:
         pass
 
-
     @abstractmethod
     def get_task_by_id(self, task_id: int) -> TaskEntity:
         pass
 
-
     @abstractmethod
     def get_count_user_tasks_in_categories(self, user: UserEntity) -> list[tuple[int, str]]:
         pass
-
 
     @abstractmethod
     def get_count_user_tasks_in_categories_by_deadlines(self, user: UserEntity) -> list[tuple[int, str, datetime]]:
@@ -39,9 +36,12 @@ class CategoryDatabaseRepositoryInterface(ABC):
     def get_category_by_id(self, category_id: int) -> CategoryEntity:
         pass   
 
-
     @abstractmethod
     def get_ordered_user_categories(self, user: UserEntity) -> list[CategoryEntity]:
+        pass
+
+    @abstractmethod
+    def delete_category(self, category_entity: CategoryEntity) -> None:
         pass
 
 
@@ -50,32 +50,36 @@ class TaskDatabaseRepository(TaskDatabaseRepositoryInterface):
         self._model = model
         self._connection = connection
 
-    
     def get_ordered_user_tasks(self, user: UserEntity) -> list[TaskEntity ]:
         return self._model.objects.filter(user=User.from_domain(user)).order_by('order').to_entity_list()
 
-
     def get_task_by_id(self, task_id: int) -> TaskEntity:
         return self._model.objects.get(id=task_id).to_domain()
-    
 
     def get_count_user_tasks_in_categories(self, user: UserEntity) -> list[tuple[int, str]]:
         cursor = self._connection.cursor()
         cursor.execute(
             '''
-            SELECT count(tt.id), tc.name, tc.color
-            FROM task_task tt
-            JOIN task_category tc
-            ON tt.category_id = tc.id
-            WHERE tt.user_id = %s
-            GROUP BY tc.name, tc.color
-            ORDER BY count(tt.id);
-            ''',
-            [user.id]
+            SELECT json_build_object(
+                'counts', array_agg(task_count), 
+                'categories', array_agg(subquery.name), 
+                'colors', array_agg(subquery.color)
             )
-        return cursor.fetchall()
-    
-    
+            FROM (
+                SELECT 
+                    tc.name,
+                    tc.color,
+                    count(tt.id) AS task_count
+                FROM task_task tt
+                JOIN task_category tc
+                ON tt.category_id = tc.id
+                WHERE tt.user_id = %s
+                GROUP BY tc.id
+            ) subquery;
+            ''', 
+            [user.id]
+        )
+        return cursor.fetchall()[0][0]
 
     def get_count_user_tasks_in_categories_by_deadlines(self, user: UserEntity) -> list[tuple[int, str, datetime]]:
         cursor = self._connection.cursor()
@@ -94,21 +98,20 @@ class TaskDatabaseRepository(TaskDatabaseRepositoryInterface):
             [user.id]
         )
         return cursor.fetchall()
-    
 
     def save_task(self, task: TaskEntity) -> None:
         Task.from_domain(task).save()
-
 
 class CategoryDatabaseRepository(CategoryDatabaseRepositoryInterface):
     def __init__(self, model: Category):
         self._model = model
 
-
     def get_category_by_id(self, category_id: int) -> CategoryEntity:
         return self._model.objects.get(id=category_id).to_domain()
-    
 
     def get_ordered_user_categories(self, user: UserEntity) -> list[CategoryEntity]:
         return self._model.objects.filter(Q(user=User.from_domain(user)) | Q(is_custom=False)).order_by('is_custom').to_entity_list()
+
+    def delete_category(self, category_entity: CategoryEntity) -> None:
+        self._model.from_domain(category_entity).delete()
 

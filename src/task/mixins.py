@@ -7,6 +7,8 @@ from django.shortcuts import resolve_url
 from django.http import HttpResponseRedirect, QueryDict
 from django.conf import settings
 from django.contrib import messages
+from user.domain.entities import UserEntity
+
 
 def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME, message='', request=None):
     """
@@ -23,19 +25,26 @@ def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_N
         messages.warning(request, message)
     return HttpResponseRedirect(urlunparse(login_url_parts))
 
+
 class TitleMixin:
+
+    def get_title(self):
+        return self.title
+
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = self.title
+        context['title'] = self.get_title()
         return context
 
 
 class UserEntityMixin:
-    def get_user_entity(self):
+
+    def get_user_entity(self) -> UserEntity:
         return self.request.user.to_domain()
     
 
 class AccessMixinWithRedirectMessage(AccessMixin):
+
     def handle_no_permission(self, message):
         if self.raise_exception or self.request.user.is_authenticated:
             raise PermissionDenied(self.get_permission_denied_message())
@@ -56,7 +65,7 @@ class AccessMixinWithRedirectMessage(AccessMixin):
             message=message,
             request=self.request
         )
-    
+
 
 class LoginRequiredMixinWithRedirectMessage(AccessMixinWithRedirectMessage):
     """Verify that the current user is authenticated."""
